@@ -1,0 +1,133 @@
+{
+  "categories": [
+    {
+      "id": "c1000000-0000-0000-0000-000000000001",
+      "slug": "toys-amigurumi",
+      "name": "Toys & Amigurumi",
+      "display_order": 1,
+      "subcategories": [
+        { "id": "11000000-0000-0000-0000-000000000001", "slug": "animal-plushies", "name": "Animal Plushies", "products": [] },
+        { "id": "11000000-0000-0000-0000-000000000002", "slug": "cartoon-characters", "name": "Cartoon Characters", "products": [] },
+        { "id": "11000000-0000-0000-0000-000000000003", "slug": "human-dolls", "name": "Human Dolls", "products": [] },
+        { "id": "11000000-0000-0000-0000-000000000004", "slug": "mini-keychains", "name": "Mini Toys / Keychains", "products": [] },
+        { "id": "11000000-0000-0000-0000-000000000005", "slug": "food-plushies", "name": "Food Plushies", "products": [] },
+        { "id": "11000000-0000-0000-0000-000000000006", "slug": "fantasy-creatures", "name": "Fantasy Creatures", "products": [] }
+      ]
+    },
+    {
+      "id": "c1000000-0000-0000-0000-000000000002",
+      "slug": "accessories",
+      "name": "Accessories",
+      "display_order": 2,
+      "subcategories": [
+        { "id": "12000000-0000-0000-0000-000000000001", "slug": "beanies", "name": "Beanies", "products": [] },
+        { "id": "12000000-0000-0000-0000-000000000002", "slug": "scarves", "name": "Scarves / Mufflers", "products": [] },
+        { "id": "12000000-0000-0000-0000-000000000003", "slug": "gloves", "name": "Gloves / Mittens", "products": [] },
+        { "id": "12000000-0000-0000-0000-000000000004", "slug": "ear-warmers", "name": "Ear Warmers", "products": [] },
+        { "id": "12000000-0000-0000-0000-000000000005", "slug": "scrunchies", "name": "Scrunchies", "products": [] },
+        { "id": "12000000-0000-0000-0000-000000000006", "slug": "headbands", "name": "Headbands", "products": [] },
+        { "id": "12000000-0000-0000-0000-000000000007", "slug": "shawls", "name": "Shawls", "products": [] }
+      ]
+    },
+    {
+      "id": "c1000000-0000-0000-0000-000000000003",
+      "slug": "bags-storage",
+      "name": "Bags & Storage",
+      "display_order": 3,
+      "subcategories": [
+        { "id": "13000000-0000-0000-0000-000000000001", "slug": "tote-bags", "name": "Tote Bags", "products": [] },
+        { "id": "13000000-0000-0000-0000-000000000002", "slug": "sling-bags", "name": "Sling Bags", "products": [] },
+        { "id": "13000000-0000-0000-0000-000000000003", "slug": "backpacks", "name": "Backpacks", "products": [] },
+        { "id": "13000000-0000-0000-0000-000000000004", "slug": "clutches", "name": "Clutches", "products": [] },
+        { "id": "13000000-0000-0000-0000-000000000005", "slug": "wallets", "name": "Wallets", "products": [] },
+        { "id": "13000000-0000-0000-0000-000000000006", "slug": "pouches", "name": "Pouches", "products": [] }
+      ]
+    },
+    {
+      "id": "c1000000-0000-0000-0000-000000000004",
+      "slug": "home-living",
+      "name": "Home & Living",
+      "display_order": 4,
+      "subcategories": [
+        { "id": "14000000-0000-0000-0000-000000000001", "slug": "wall-hangings", "name": "Wall Hangings", "products": [] },
+        { "id": "14000000-0000-0000-0000-000000000002", "slug": "plant-hangers", "name": "Plant Hangers", "products": [] },
+        { "id": "14000000-0000-0000-0000-000000000003", "slug": "lampshades", "name": "Lampshades", "products": [] },
+        { "id": "14000000-0000-0000-0000-000000000004", "slug": "cushion-covers", "name": "Cushion Covers", "products": [] },
+        { "id": "14000000-0000-0000-0000-000000000005", "slug": "table-runners", "name": "Table Runners", "products": [] },
+        { "id": "14000000-0000-0000-0000-000000000006", "slug": "doilies", "name": "Doilies", "products": [] }
+      ]
+    },
+    {
+      "id": "c1000000-0000-0000-0000-000000000005",
+      "slug": "gifts-decor",
+      "name": "Gifts & Decor",
+      "display_order": 5,
+      "subcategories": [
+        { "id": "15000000-0000-0000-0000-000000000001", "slug": "crochet-flowers", "name": "Crochet Flowers / Bouquets", "products": [] },
+        { "id": "15000000-0000-0000-0000-000000000002", "slug": "gift-keychains", "name": "Keychains", "products": [] },
+        { "id": "15000000-0000-0000-0000-000000000003", "slug": "coasters", "name": "Coasters", "products": [] },
+        { "id": "15000000-0000-0000-0000-000000000004", "slug": "mini-decor", "name": "Mini Decor Items", "products": [] }
+      ]
+    },
+    {
+      "id": "c1000000-0000-0000-0000-000000000006",
+      "slug": "utility-products",
+      "name": "Utility Products",
+      "display_order": 6,
+      "subcategories": [
+        { "id": "16000000-0000-0000-0000-000000000001", "slug": "dishcloths", "name": "Dishcloths / Scrubbers", "products": [] },
+        { "id": "16000000-0000-0000-0000-000000000002", "slug": "bottle-holders", "name": "Bottle Holders", "products": [] },
+        { "id": "16000000-0000-0000-0000-000000000003", "slug": "phone-pouches", "name": "Phone Pouches / Covers", "products": [] },
+        { "id": "16000000-0000-0000-0000-000000000004", "slug": "glass-holders", "name": "Glass Holders", "products": [] }
+      ]
+    },
+    {
+      "id": "c1000000-0000-0000-0000-000000000007",
+      "slug": "custom-personalized",
+      "name": "Custom & Personalized",
+      "display_order": 7,
+      "subcategories": [
+        { "id": "17000000-0000-0000-0000-000000000001", "slug": "custom-dolls", "name": "Custom Dolls (from photo)", "products": [] },
+        { "id": "17000000-0000-0000-0000-000000000002", "slug": "name-keychains", "name": "Name Keychains", "products": [] },
+        { "id": "17000000-0000-0000-0000-000000000003", "slug": "couple-gifts", "name": "Couple Gifts", "products": [] },
+        { "id": "17000000-0000-0000-0000-000000000004", "slug": "gift-hampers", "name": "Gift Hampers", "products": [] }
+      ]
+    },
+    {
+      "id": "c1000000-0000-0000-0000-000000000008",
+      "slug": "seasonal-collection",
+      "name": "Seasonal Collection",
+      "display_order": 8,
+      "subcategories": [
+        { "id": "18000000-0000-0000-0000-000000000001", "slug": "christmas", "name": "Christmas", "products": [] },
+        { "id": "18000000-0000-0000-0000-000000000002", "slug": "diwali", "name": "Diwali", "products": [] },
+        { "id": "18000000-0000-0000-0000-000000000003", "slug": "valentine", "name": "Valentine", "products": [] },
+        { "id": "18000000-0000-0000-0000-000000000004", "slug": "halloween", "name": "Halloween", "products": [] }
+      ]
+    },
+    {
+      "id": "c1000000-0000-0000-0000-000000000009",
+      "slug": "art-premium",
+      "name": "Art & Premium",
+      "display_order": 9,
+      "subcategories": [
+        { "id": "19000000-0000-0000-0000-000000000001", "slug": "wall-art", "name": "Wall Art", "products": [] },
+        { "id": "19000000-0000-0000-0000-000000000002", "slug": "sculptures", "name": "Sculptures", "products": [] },
+        { "id": "19000000-0000-0000-0000-000000000003", "slug": "designer-pieces", "name": "Designer Pieces", "products": [] },
+        { "id": "19000000-0000-0000-0000-000000000004", "slug": "exhibition-items", "name": "Exhibition Items", "products": [] }
+      ]
+    },
+    {
+      "id": "c1000000-0000-0000-0000-000000000010",
+      "slug": "diy-supplies",
+      "name": "DIY & Supplies",
+      "display_order": 10,
+      "subcategories": [
+        { "id": "1a000000-0000-0000-0000-000000000001", "slug": "diy-kits", "name": "DIY Kits", "products": [] },
+        { "id": "1a000000-0000-0000-0000-000000000002", "slug": "patterns-pdf", "name": "Patterns (PDF)", "products": [] },
+        { "id": "1a000000-0000-0000-0000-000000000003", "slug": "yarn-bundles", "name": "Yarn Bundles", "products": [] },
+        { "id": "1a000000-0000-0000-0000-000000000004", "slug": "crochet-tools", "name": "Crochet Tools", "products": [] }
+      ]
+    }
+  ]
+}
