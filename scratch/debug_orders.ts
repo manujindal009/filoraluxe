@@ -1,32 +1,40 @@
+import { createClient } from "@supabase/supabase-js";
 
-import { supabase } from "../lib/supabaseClient";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
-async function debugOrders() {
-  console.log("--- Debugging Orders ---");
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
+
+async function debug() {
+  console.log("--- DEBUGGING ORDERS ---");
+  const { data: orders, error } = await supabaseAdmin.from("orders").select("id, user_id, total, status").limit(5);
   
-  // 1. Check current session
-  const { data: { session } } = await supabase.auth.getSession();
-  console.log("Current User ID:", session?.user?.id || "None");
-
-  // 2. Fetch all orders (bypassing RLS if possible, but here using anon key)
-  const { data: allOrders, error: allErr } = await supabase
-    .from('orders')
-    .select('id, user_id, total, status')
-    .limit(5);
+  if (error) {
+    console.error("Error fetching orders:", error);
+    return;
+  }
   
-  console.log("Sample Orders from DB:", allOrders);
-  if (allErr) console.error("Error fetching sample:", allErr);
+  if (!orders || orders.length === 0) {
+    console.log("No orders found in database.");
+    return;
+  }
 
-  // 3. Try fetching with user_id filter specifically
-  if (session?.user?.id) {
-    const { data: userOrders, error: userErr } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('user_id', session.user.id);
+  console.log(`Found ${orders.length} orders:`);
+  for (const order of orders) {
+    console.log(`Order ID: ${order.id}, User ID: ${order.user_id}, Total: ${order.total}`);
     
-    console.log(`Orders matching current UID (${session.user.id}):`, userOrders?.length || 0);
-    if (userErr) console.error("Error fetching user orders:", userErr);
+    // Check if the user_id exists in profiles
+    if (order.user_id) {
+      const { data: profile } = await supabaseAdmin.from("profiles").select("id, email, name").eq("id", order.user_id).single();
+      if (profile) {
+        console.log(`  -> Linked to Profile: ${profile.name} (${profile.email})`);
+      } else {
+        console.log(`  -> WARNING: user_id ${order.user_id} NOT FOUND in profiles table!`);
+      }
+    } else {
+      console.log(`  -> WARNING: user_id is NULL!`);
+    }
   }
 }
 
-debugOrders();
+debug();
