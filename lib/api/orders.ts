@@ -119,17 +119,15 @@ export async function placeOrder(
 }
 
 export async function fetchUserOrders(userId: string): Promise<Order[]> {
-  // Deep-dive logging for visibility gap forensics
-  const { data: authData } = await supabase.auth.getUser();
-  const sessionUser = authData?.user;
-  
-  console.log(`[fetchUserOrders] --- START DEBUG ---`);
-  console.log(`[fetchUserOrders] Param UserID: ${userId}`);
-  console.log(`[fetchUserOrders] Auth Session UID: ${sessionUser?.id || "NO ACTIVE SESSION"}`);
-  console.log(`[fetchUserOrders] Auth Email: ${sessionUser?.email || "N/A"}`);
+  if (!userId) {
+    console.warn("[fetchUserOrders] Called with null/undefined userId. Returning empty array.");
+    return [];
+  }
 
   // Force cast userId to string and trim to be safe
   const targetId = String(userId).trim();
+
+  console.log(`[fetchUserOrders] Executing primary query for user: ${targetId}`);
 
   let { data, error } = await supabase
     .from('orders')
@@ -139,41 +137,47 @@ export async function fetchUserOrders(userId: string): Promise<Order[]> {
         quantity,
         price_at_time,
         product_id,
-        products!product_id (name)
+        products ( name )
       )
     `)
     .eq('user_id', targetId)
     .order('created_at', { ascending: false });
 
-  // FALLBACK: If join fails or returns 42501 (Permission Denied), try a simple orders fetch
-  if (error || (!data || data.length === 0)) {
-    console.log(`[fetchUserOrders] Primary query result: ${data?.length || 0} rows. Error: ${error?.message || "None"}`);
+  // FALLBACK: If join fails (PGRST200) or returns error, try a simple orders fetch
+  if (error) {
+    console.error(`[fetchUserOrders] Primary query failed. Error: ${error.message} (Code: ${error.code})`);
     
-    // Check if it's a permission issue or just no data
-    if (error?.code === '42501' || !data || data.length === 0) {
-      console.warn(`[fetchUserOrders] Entering FALLBACK mode for user ${targetId}...`);
-      const { data: simpleData, error: simpleError } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('user_id', targetId)
-        .order('created_at', { ascending: false });
-      
-      if (!simpleError && simpleData && simpleData.length > 0) {
-        console.log(`[fetchUserOrders] FALLBACK SUCCESS: Found ${simpleData.length} orders via simple query.`);
-        data = simpleData;
-      } else if (simpleError) {
-        console.error(`[fetchUserOrders] FALLBACK FAILED. Simple Error: ${simpleError.message}`);
-        error = simpleError;
-      }
+    // Entering FALLBACK mode
+    console.warn(`[fetchUserOrders] Entering SAFE FALLBACK mode for user ${targetId}...`);
+    const { data: fallbackData, error: fallbackError } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        order_items (
+          quantity,
+          price_at_time,
+          product_id
+        )
+      `)
+      .eq('user_id', targetId)
+      .order('created_at', { ascending: false });
+    
+    if (!fallbackError && fallbackData) {
+      console.log(`[fetchUserOrders] FALLBACK SUCCESS: Found ${fallbackData.length} orders safely.`);
+      data = fallbackData;
+      error = null; // Clear the primary error as we recovered
+    } else if (fallbackError) {
+      console.error(`[fetchUserOrders] FALLBACK ALSO FAILED. Error: ${fallbackError.message}`);
+      error = fallbackError;
     }
   }
 
   if (error) {
-    console.error(`[fetchUserOrders] FINAL DB Error: `, JSON.stringify(error, null, 2));
+    console.error(`[fetchUserOrders] CRITICAL: Final DB Error:`, error);
     return [];
   }
 
-  console.log(`[fetchUserOrders] Returning ${data?.length || 0} orders to UI.`);
+  console.log(`[fetchUserOrders] Successfully retrieved ${data?.length || 0} records.`);
   
   return (data || []).map((o: any) => ({
     id: o.id,

@@ -400,28 +400,7 @@ export default function ProfilePage() {
 
         {/* Content */}
         <div className="w-full md:w-3/4">
-          {/* FORENSIC DEBUG CARD - TEMPORARY */}
-          <div className="mb-8 p-4 bg-slate-900 text-emerald-400 rounded-xl font-mono text-[10px] border border-emerald-500/30 shadow-2xl">
-            <div className="flex justify-between items-center mb-2 border-b border-emerald-500/20 pb-2">
-              <span className="uppercase font-bold tracking-widest text-emerald-500">Forensic Identity Audit</span>
-              <span className="bg-emerald-500/10 px-2 py-0.5 rounded text-emerald-500">Live Browser Data</span>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-slate-500 uppercase mb-1">Authenticated UID</p>
-                <div className="truncate">{user?.id || "NULL"}</div>
-              </div>
-              <div>
-                <p className="text-slate-500 uppercase mb-1">Orders Found (Raw)</p>
-                <div className={orders.length > 0 ? "text-emerald-400" : "text-rose"}>{orders.length} Records</div>
-              </div>
-            </div>
-            {orders.length === 0 && !isLoadingOrders && (
-              <div className="mt-2 pt-2 border-t border-emerald-500/10 text-rose italic">
-                Reason: No rows returned for this UID. Double check RLS or the User ID in DB.
-              </div>
-            )}
-          </div>
+
 
           {activeTab === "orders" ? (
             <div>

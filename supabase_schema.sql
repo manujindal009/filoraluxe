@@ -93,7 +93,7 @@ BEGIN
     new.id, 
     new.email, 
     COALESCE(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
-    'admin' -- FOR DEMO PURPOSES ONLY! WE ARE MAKING EVERYONE AN ADMIN TO TEST THE PANEL!
+    'user' -- FIX: Default to 'user' role for security.
   );
   RETURN new;
 END;
