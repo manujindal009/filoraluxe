@@ -62,8 +62,13 @@ export async function placeOrder(
     }])
     .select()
     .single();
+  
+  if (orderError) {
+    console.error(`[placeOrder] DB Error for User ${userId}:`, orderError);
+    throw orderError;
+  }
 
-  if (orderError) throw orderError;
+  console.log(`[placeOrder] Successfully created Order ${newOrderId} for User ${userId}`);
 
   // Bump the coupon usage count if one was applied
   if (couponDetails?.code) {
@@ -129,9 +134,15 @@ export async function fetchUserOrders(userId: string): Promise<Order[]> {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error("Failed to load user orders. Error details:", JSON.stringify(error, null, 2));
+    console.error(`[fetchUserOrders] Failed for User ${userId}. Error details:`, JSON.stringify(error, null, 2));
+    // If error.code is 42501, it's a Permission Denied (RLS) issue
+    if (error.code === '42501') {
+      console.warn(`[fetchUserOrders] RLS Policy is blocking access for User ${userId}`);
+    }
     return [];
   }
+
+  console.log(`[fetchUserOrders] Successfully loaded ${data?.length || 0} orders for User ${userId}`);
 
   return data.map(o => ({
     id: o.id,

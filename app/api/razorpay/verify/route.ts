@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
 import { sendOrderConfirmationEmail } from "@/lib/utils/email";
 
 export async function POST(req: Request) {
@@ -12,6 +12,8 @@ export async function POST(req: Request) {
       orderDetails // Contains userId, items, shippingDetails, total, and options
     } = await req.json();
 
+    console.log(`[RazorpayVerify] Initiating verification for Order: ${razorpay_order_id}, User: ${orderDetails?.userId}`);
+
     // 1. Verify Signature
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
@@ -22,6 +24,7 @@ export async function POST(req: Request) {
     const isAuthentic = expectedSignature === razorpay_signature;
 
     if (!isAuthentic) {
+      console.error(`[RazorpayVerify] Signature mismatch for User: ${orderDetails?.userId}`);
       return NextResponse.json({ error: "Invalid payment signature" }, { status: 400 });
     }
 
@@ -30,7 +33,9 @@ export async function POST(req: Request) {
     const { userId, items, shippingDetails, total, options } = orderDetails;
     const { couponDetails } = options;
 
-    // 3. Insert Order into Supabase
+    console.log(`[RazorpayVerify] Signature Valid. Creating DB Order: ${newOrderId} for User: ${userId}`);
+
+    // 3. Insert Order into Supabase (Using Admin Client to bypass RLS)
     const { data: orderData, error: orderError } = await supabase
       .from('orders')
       .insert([{

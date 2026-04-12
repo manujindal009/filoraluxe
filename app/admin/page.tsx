@@ -1,17 +1,17 @@
 "use client";
 
 import React from "react";
-import { DollarSign, ShoppingBag, Users, TrendingUp } from "lucide-react";
+import { IndianRupee, ShoppingBag, Users, TrendingUp } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { fetchAdminStats, DashboardStats } from "@/lib/api/analytics";
 import { Loader } from "@/components/ui/Loader";
 
 // Base stats template
 const STATS_TEMPLATE = [
-  { label: "Total Revenue", key: "totalRevenue", isCurrency: true, icon: DollarSign },
+  { label: "Total Revenue", key: "totalRevenue", isCurrency: true, icon: IndianRupee },
   { label: "Orders", key: "totalOrders", isCurrency: false, icon: ShoppingBag },
   { label: "Customers", key: "totalCustomers", isCurrency: false, icon: Users },
-  { label: "Conversion Rate", key: "conversion", isCurrency: false, isPercent: true, icon: TrendingUp },
+  { label: "Conversion Rate", key: "conversionRate", isCurrency: false, isPercent: true, icon: TrendingUp },
 ];
 
 export default function AdminDashboardPage() {
@@ -41,10 +41,10 @@ export default function AdminDashboardPage() {
   }
 
   const dashboardStats = [
-    { label: "Total Revenue", value: stats?.totalRevenue || 0, isCurrency: true, icon: DollarSign, trend: "+0%" },
-    { label: "Orders", value: stats?.totalOrders || 0, isCurrency: false, icon: ShoppingBag, trend: "+0%" },
-    { label: "Customers", value: stats?.totalCustomers || 0, isCurrency: false, icon: Users, trend: "+0%" },
-    { label: "Conversion Rate", value: 0, isCurrency: false, isPercent: true, icon: TrendingUp, trend: "+0%" },
+    { label: "Total Revenue", value: stats?.totalRevenue || 0, isCurrency: true, icon: IndianRupee, trend: stats?.revenueTrend || "+0%" },
+    { label: "Orders", value: stats?.totalOrders || 0, isCurrency: false, icon: ShoppingBag, trend: stats?.ordersTrend || "+0%" },
+    { label: "Customers", value: stats?.totalCustomers || 0, isCurrency: false, icon: Users, trend: stats?.customersTrend || "+0%" },
+    { label: "Conversion Rate", value: stats?.conversionRate || 0, isCurrency: false, isPercent: true, icon: TrendingUp, trend: stats?.conversionTrend || "+0%" },
   ];
   return (
     <div className="space-y-8">

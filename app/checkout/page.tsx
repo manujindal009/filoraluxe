@@ -247,6 +247,7 @@ export default function CheckoutPage() {
       return;
     }
 
+    console.log(`[CheckoutSubmit] User: ${user?.id}, Items: ${items.length}, Method: ${formData.paymentMethod}`);
     setIsProcessing(true);
 
     if (formData.paymentMethod === "razorpay") {
