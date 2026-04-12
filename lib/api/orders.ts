@@ -1,4 +1,4 @@
-import { Order, CartItem } from "@/types";
+import { Order, OrderItem, CartItem } from "@/types";
 import { supabase } from "@/lib/supabaseClient";
 
 export async function placeOrder(
@@ -95,7 +95,11 @@ export async function placeOrder(
   return {
     id: orderData.id,
     userId: orderData.user_id,
-    items, 
+    items: items.map(item => ({
+      product: item.product,
+      quantity: item.quantity,
+      price_at_time: item.product.price
+    })),
     total: orderData.total,
     status: orderData.status,
     createdAt: orderData.created_at,
@@ -110,7 +114,7 @@ export async function placeOrder(
     isForSomeoneElse: orderData.is_for_someone_else,
     recipientPhone: orderData.recipient_phone,
     utrNumber: orderData.utr_number,
-    gift_wrap_charge: orderData.gift_wrap_charge,
+    gift_wrap_charge: orderData.gift_wrap_charge ?? 0,
     couponCode: orderData.coupon_code,
     discountAmount: orderData.discount_amount,
     finalAmount: orderData.final_amount,
@@ -201,7 +205,7 @@ export async function fetchUserOrders(userId: string): Promise<Order[]> {
     isForSomeoneElse: o.is_for_someone_else,
     recipientPhone: o.recipient_phone,
     utrNumber: o.utr_number,
-    gift_wrap_charge: o.gift_wrap_charge,
+    gift_wrap_charge: o.gift_wrap_charge ?? 0,
     couponCode: o.coupon_code,
     discountAmount: o.discount_amount,
     finalAmount: o.final_amount,
@@ -238,7 +242,7 @@ export async function fetchAllOrders(): Promise<Order[]> {
     isForSomeoneElse: o.is_for_someone_else,
     recipientPhone: o.recipient_phone,
     utrNumber: o.utr_number,
-    gift_wrap_charge: o.gift_wrap_charge,
+    gift_wrap_charge: o.gift_wrap_charge ?? 0,
     couponCode: o.coupon_code,
     discountAmount: o.discount_amount,
     finalAmount: o.final_amount,
@@ -274,7 +278,7 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'pr
     isForSomeoneElse: data.is_for_someone_else,
     recipientPhone: data.recipient_phone,
     utrNumber: data.utr_number,
-    gift_wrap_charge: data.gift_wrap_charge,
+    gift_wrap_charge: data.gift_wrap_charge ?? 0,
     couponCode: data.coupon_code,
     discountAmount: data.discount_amount,
     finalAmount: data.final_amount,
