@@ -6,28 +6,28 @@ export const categories: Category[] = [
     name: "Toys & Amigurumi",
     slug: "toys-amigurumi",
     description: "Handcrafted crochet plushies, dolls, and figurines.",
-    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/toys.jpeg"
+    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/toys%20and%20amigurumi.jpeg"
   },
   {
     id: "c1000000-0000-0000-0000-000000000002",
     name: "Accessories",
     slug: "accessories",
     description: "Wearable crochet pieces for every season.",
-    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/accsessories.jpeg"
+    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/accsessory.jpeg"
   },
   {
     id: "c1000000-0000-0000-0000-000000000003",
     name: "Bags & Storage",
     slug: "bags-storage",
     description: "Stunning handmade bags, totes, and pouches.",
-    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/bags%20and%20storage.jpeg"
+    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/bags.jpeg"
   },
   {
     id: "c1000000-0000-0000-0000-000000000004",
     name: "Home & Living",
     slug: "home-living",
     description: "Crochet décor to elevate your living spaces.",
-    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/home%20and%20living.jpeg"
+    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/home%20nd%20living.jpeg"
   },
   {
     id: "c1000000-0000-0000-0000-000000000005",
@@ -62,7 +62,7 @@ export const categories: Category[] = [
     name: "Art & Premium",
     slug: "art-premium",
     description: "Museum-quality crochet art and collector pieces.",
-    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/art%20and%20premium.jpeg"
+    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/art.jpeg"
   },
   {
     id: "c1000000-0000-0000-0000-000000000010",
