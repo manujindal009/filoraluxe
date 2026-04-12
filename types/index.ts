@@ -42,10 +42,16 @@ export interface User {
   createdAt: string;
 }
 
+export interface OrderItem {
+  product: Product;
+  quantity: number;
+  price_at_time: number;
+}
+
 export interface Order {
   id: string;
   userId: string;
-  items: CartItem[];
+  items: OrderItem[];
   total: number;
   discountAmount?: number;
   finalAmount?: number;

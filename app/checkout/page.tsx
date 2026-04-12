@@ -192,7 +192,7 @@ export default function CheckoutPage() {
                   options: {
                     deliveryCharge,
                     gstAmount,
-                    giftWrapCharge,
+                    gift_wrap_charge: giftWrapCharge,
                     isGift: formData.isGift,
                     giftMessage: formData.giftMessage,
                     recipientName: formData.recipientName,
@@ -276,7 +276,7 @@ export default function CheckoutPage() {
           paymentMethod: 'cod',
           deliveryCharge,
           gstAmount,
-          giftWrapCharge,
+          gift_wrap_charge: giftWrapCharge,
           isGift: formData.isGift,
           giftMessage: formData.giftMessage,
           recipientName: formData.recipientName,

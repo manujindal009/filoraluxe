@@ -57,7 +57,7 @@ export async function POST(req: Request) {
         recipient_name: options.recipientName || null,
         is_for_someone_else: options.isForSomeoneElse || false,
         recipient_phone: options.recipientPhone || null,
-        gift_wrap_charge: options.giftWrapCharge || 0,
+        gift_wrap_charge: options.gift_wrap_charge || 0,
         pincode: shippingDetails.zipCode,
         state: shippingDetails.state,
         coupon_code: couponDetails?.code || null,

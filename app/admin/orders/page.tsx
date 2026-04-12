@@ -142,8 +142,8 @@ export default function AdminOrdersPage() {
                       <div className="flex flex-col text-[10px] text-foreground/60 leading-tight">
                         <span>GST: {formatPrice(order.gstAmount || 0)}</span>
                         <span>Del: {formatPrice(order.deliveryCharge || 0)}</span>
-                        {order.giftWrapCharge && order.giftWrapCharge > 0 ? (
-                          <span className="text-rose font-medium">GW: {formatPrice(order.giftWrapCharge)}</span>
+                        {order.gift_wrap_charge && order.gift_wrap_charge > 0 ? (
+                          <span className="text-rose font-medium">GW: {formatPrice(order.gift_wrap_charge)}</span>
                         ) : null}
                       </div>
                     </td>

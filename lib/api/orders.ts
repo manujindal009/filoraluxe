@@ -26,7 +26,7 @@ export async function placeOrder(
     isForSomeoneElse?: boolean;
     recipientPhone?: string;
     utrNumber?: string;
-    giftWrapCharge?: number;
+    gift_wrap_charge?: number;
     couponDetails?: { code: string; discountAmount: number; finalAmount: number; ownerName: string };
   }
 ): Promise<Order> {
@@ -52,7 +52,7 @@ export async function placeOrder(
       is_for_someone_else: options.isForSomeoneElse || false,
       recipient_phone: options.recipientPhone || null,
       utr_number: options.utrNumber || null,
-      gift_wrap_charge: options.giftWrapCharge || 0,
+      gift_wrap_charge: options.gift_wrap_charge || 0,
       pincode: shippingDetails.zipCode,
       state: shippingDetails.state,
       coupon_code: couponDetails?.code || null,
@@ -110,7 +110,7 @@ export async function placeOrder(
     isForSomeoneElse: orderData.is_for_someone_else,
     recipientPhone: orderData.recipient_phone,
     utrNumber: orderData.utr_number,
-    giftWrapCharge: orderData.gift_wrap_charge,
+    gift_wrap_charge: orderData.gift_wrap_charge,
     couponCode: orderData.coupon_code,
     discountAmount: orderData.discount_amount,
     finalAmount: orderData.final_amount,
