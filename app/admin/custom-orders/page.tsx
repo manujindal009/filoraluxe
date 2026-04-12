@@ -196,7 +196,9 @@ export default function AdminCustomOrdersPage() {
                         </a>
                       ) : (
                         <div className="w-12 h-12 rounded-lg border border-dashed border-secondary flex items-center justify-center text-foreground/20">
-                          <ImageIcon className="w-5 h-5" title="No reference image" />
+                          <div title="Preview">
+  <ImageIcon className="w-5 h-5" />
+</div>
                         </div>
                       )}
                     </td>
