@@ -8,6 +8,7 @@ interface AuthContextType {
   user: AppUser | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   register: (email: string, password: string, name: string, phone: string) => Promise<void>;
   resendVerification: (email: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -138,6 +139,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
+  const loginWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+    if (error) throw error;
+  };
+
   const resendVerification = async (email: string) => {
     const { error } = await supabase.auth.resend({
       type: 'signup',
@@ -154,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = user?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, isAdmin, resendVerification } as any}>
+    <AuthContext.Provider value={{ user, isLoading, login, loginWithGoogle, register, logout, isAdmin, resendVerification } as any}>
       {children}
     </AuthContext.Provider>
   );

@@ -46,8 +46,7 @@ export default function CheckoutPage() {
     recipientName: "",
     isForSomeoneElse: false,
     recipientPhone: "",
-    paymentMethod: "upi" as "credit_card" | "cod" | "upi",
-    utrNumber: "",
+    paymentMethod: "razorpay" as "razorpay" | "cod",
   });
 
   React.useEffect(() => {
@@ -130,6 +129,112 @@ export default function CheckoutPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleRazorpayPayment = async () => {
+    if (!user) return;
+
+    try {
+      // 1. Create Razorpay Order on server
+      const orderRes = await fetch("/api/razorpay/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: grandTotal }),
+      });
+      const orderData = await orderRes.json();
+
+      if (orderData.error) throw new Error(orderData.error);
+
+      // 2. Setup Razorpay Options
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Filora Luxe",
+        description: "Premium Crochet Payment",
+        order_id: orderData.id,
+        prefill: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: { color: "#E11D48" }, // Rose color
+        handler: async function (response: any) {
+          try {
+            setIsVerifyingPayment(true);
+            
+            // 3. Verify Payment on server (This creates the order in DB and sends email)
+            const verifyRes = await fetch("/api/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                orderDetails: {
+                  userId: user.id,
+                  items,
+                  shippingDetails: {
+                    name: `${formData.firstName} ${formData.lastName}`.trim(),
+                    email: formData.email,
+                    phone: formData.phone,
+                    street: formData.address,
+                    city: formData.city,
+                    state: formData.state,
+                    zipCode: formData.zipCode,
+                    country: formData.country,
+                  },
+                  total,
+                  options: {
+                    deliveryCharge,
+                    gstAmount,
+                    giftWrapCharge,
+                    isGift: formData.isGift,
+                    giftMessage: formData.giftMessage,
+                    recipientName: formData.recipientName,
+                    isForSomeoneElse: formData.isForSomeoneElse,
+                    recipientPhone: formData.recipientPhone,
+                    couponDetails: activeCoupon ? {
+                      code: activeCoupon.code,
+                      discountAmount: discount,
+                      finalAmount: grandTotal,
+                      ownerName: activeCoupon.ownerName
+                    } : undefined
+                  }
+                }
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              clearCart();
+              addToast("Payment successful! Order confirmed.", "success");
+              router.push("/checkout/success");
+            } else {
+              throw new Error(verifyData.error || "Verification failed");
+            }
+          } catch (err: any) {
+            console.error("Verification error:", err);
+            addToast(err.message || "Payment verification failed. Please contact support.", "error");
+          } finally {
+            setIsVerifyingPayment(false);
+          }
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
+            addToast("Payment cancelled", "error");
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error: any) {
+      console.error("Razorpay error:", error);
+      addToast(error.message || "Failed to initiate payment", "error");
+      setIsProcessing(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) {
@@ -137,68 +242,54 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+
     setIsProcessing(true);
-    
-    // Call placeOrder to save DB
-    try {
-      if (!user) {
-        setShowAuthModal(true);
+
+    if (formData.paymentMethod === "razorpay") {
+      await handleRazorpayPayment();
+    } else if (formData.paymentMethod === "cod") {
+      // Reusing logic for COD if needed
+      try {
+        const shippingDetails = {
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          email: formData.email,
+          phone: formData.phone,
+          street: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+          country: formData.country,
+        };
+
+        await placeOrder(user.id, items, shippingDetails, total, {
+          paymentMethod: 'cod',
+          deliveryCharge,
+          gstAmount,
+          giftWrapCharge,
+          isGift: formData.isGift,
+          giftMessage: formData.giftMessage,
+          recipientName: formData.recipientName,
+          isForSomeoneElse: formData.isForSomeoneElse,
+          recipientPhone: formData.recipientPhone,
+          couponDetails: activeCoupon ? {
+            code: activeCoupon.code,
+            discountAmount: discount,
+            finalAmount: grandTotal,
+            ownerName: activeCoupon.ownerName
+          } : undefined
+        });
+
+        clearCart();
+        addToast("Order placed successfully (COD)!", "success");
+        router.push("/checkout/success");
+      } catch (error) {
+        addToast("Checkout failed", "error");
         setIsProcessing(false);
-        return;
       }
-
-      if (formData.paymentMethod === 'upi') {
-        if (formData.utrNumber.length !== 12) {
-          addToast("Please enter a valid 12-digit UTR/Transaction ID", "error");
-          setIsProcessing(false);
-          return;
-        }
-
-        // Simulation of verification
-        setIsVerifyingPayment(true);
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        setIsVerifyingPayment(false);
-      }
-      
-      const userId = user.id; 
-
-      const shippingDetails = {
-        name: `${formData.firstName} ${formData.lastName}`.trim(),
-        email: formData.email,
-        phone: formData.phone,
-        street: formData.address,
-        city: formData.city,
-        state: formData.state,
-        zipCode: formData.zipCode,
-        country: formData.country,
-      };
-
-      await placeOrder(userId, items, shippingDetails, total, {
-        paymentMethod: formData.paymentMethod,
-        utrNumber: formData.utrNumber,
-        deliveryCharge,
-        gstAmount,
-        giftWrapCharge,
-        isGift: formData.isGift,
-        giftMessage: formData.giftMessage,
-        recipientName: formData.recipientName,
-        isForSomeoneElse: formData.isForSomeoneElse,
-        recipientPhone: formData.recipientPhone,
-        couponDetails: activeCoupon ? {
-          code: activeCoupon.code,
-          discountAmount: discount,
-          finalAmount: grandTotal,
-          ownerName: activeCoupon.ownerName
-        } : undefined
-      });
-
-      clearCart();
-      addToast("Order placed successfully!", "success");
-      router.push("/checkout/success"); 
-    } catch (error) {
-      console.error("Order error:", error);
-      addToast("Failed to place order. Please try again.", "error");
-      setIsProcessing(false);
     }
   };
 
@@ -401,58 +492,26 @@ export default function CheckoutPage() {
             <div className="bg-primary/10 p-6 rounded-xl border border-primary/30">
               <h2 className="text-xl font-serif font-medium mb-4">Payment Method</h2>
               <div className="space-y-3">
-                {/* UPI Option */}
-                <label className={`p-4 border rounded-md flex flex-col cursor-pointer transition-all ${formData.paymentMethod === 'upi' ? 'border-rose bg-white ring-1 ring-rose' : 'border-secondary bg-white/50'}`}>
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-3">
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="upi"
-                        checked={formData.paymentMethod === 'upi'}
-                        onChange={() => setFormData(p => ({...p, paymentMethod: 'upi'}))}
-                        className="text-rose focus:ring-rose accent-rose" 
-                      />
-                      <div className="flex flex-col">
-                        <span className="font-medium text-sm">UPI (Manual / QR)</span>
-                        <span className="text-xs text-foreground/60">Pay using any UPI app & upload screenshot</span>
-                      </div>
+                {/* Razorpay Option */}
+                <label className={`p-4 border rounded-md flex items-center justify-between cursor-pointer transition-all ${formData.paymentMethod === 'razorpay' ? 'border-rose bg-white ring-1 ring-rose' : 'border-secondary bg-white/50'}`}>
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="radio" 
+                      name="paymentMethod" 
+                      value="razorpay"
+                      checked={formData.paymentMethod === 'razorpay'}
+                      onChange={() => setFormData(p => ({...p, paymentMethod: 'razorpay'}))}
+                      className="text-rose focus:ring-rose accent-rose" 
+                    />
+                    <div className="flex flex-col">
+                      <span className="font-medium text-sm">Pay Securely (Cards, UPI, Netbanking)</span>
+                      <span className="text-xs text-foreground/60">Secure payment powered by Razorpay</span>
                     </div>
-                    <Smartphone className="w-5 h-5 text-foreground/40" />
                   </div>
-                  
-                  {formData.paymentMethod === 'upi' && (
-                    <div className="mt-4 pt-4 border-t border-secondary animate-in fade-in slide-in-from-top-2">
-                      <div className="flex flex-col items-center gap-4 bg-secondary/10 p-4 rounded-lg">
-                        <p className="text-xs font-semibold text-center mb-1">Scan to Pay: {formatPrice(grandTotal)}</p>
-                        {/* Dynamic QR Code Generator (Google Chart API for simplicity) */}
-                        <div className="w-40 h-40 bg-white p-2 rounded-lg shadow-sm">
-                          <img 
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=Filora%20Luxe&am=${grandTotal}&cu=INR`)}`} 
-                            alt="Scan to Pay" 
-                            className="w-full h-full"
-                          />
-                        </div>
-                        <p className="text-[10px] text-center text-foreground/60">UPI ID: <span className="font-mono bg-white px-1">{UPI_ID}</span></p>
-                        
-                        <div className="w-full mt-4">
-                          <label className="block text-[10px] font-bold uppercase text-foreground/50 mb-1">Enter Transaction ID (UTR)</label>
-                          <input 
-                            required={formData.paymentMethod === 'upi'}
-                            type="text"
-                            maxLength={12}
-                            placeholder="12-digit UTR Number"
-                            value={formData.utrNumber}
-                            onChange={(e) => setFormData(p => ({...p, utrNumber: e.target.value.replace(/\D/g, '')}))}
-                            className="w-full border border-secondary rounded-md px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-rose font-mono"
-                          />
-                          <p className="text-[10px] text-foreground/40 mt-2 text-center">
-                            Payment issue? Email <a href={`mailto:${SUPPORT_EMAIL}`} className="text-rose hover:underline">{SUPPORT_EMAIL}</a>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2 text-foreground/40">
+                    <CreditCard className="w-5 h-5" />
+                    <Smartphone className="w-5 h-5" />
+                  </div>
                 </label>
 
                 {/* COD Option */}
@@ -473,26 +532,11 @@ export default function CheckoutPage() {
                   </div>
                   <User className="w-5 h-5 text-foreground/40" />
                 </label>
-
-                {/* Card Option Placeholder */}
-                <label className={`p-4 border rounded-md flex items-center justify-between cursor-pointer transition-all ${formData.paymentMethod === 'credit_card' ? 'border-rose bg-white ring-1 ring-rose' : 'border-secondary bg-white/50 opacity-60'}`}>
-                  <div className="flex items-center gap-3">
-                    <input 
-                      type="radio" 
-                      name="paymentMethod" 
-                      value="credit_card"
-                      checked={formData.paymentMethod === 'credit_card'}
-                      onChange={() => setFormData(p => ({...p, paymentMethod: 'credit_card'}))}
-                      className="text-rose focus:ring-rose accent-rose" 
-                    />
-                    <div className="flex flex-col">
-                      <span className="font-medium text-sm">Credit / Debit Card</span>
-                      <span className="text-xs text-foreground/60">Pay securely via gateway (Coming Soon)</span>
-                    </div>
-                  </div>
-                  <CreditCard className="w-5 h-5 text-foreground/40" />
-                </label>
               </div>
+              <p className="mt-4 text-[10px] text-foreground/40 flex items-center gap-1">
+                <Info className="w-3 h-3" />
+                Online payments are encrypted and processed by Razorpay. We do not store your card details.
+              </p>
             </div>
 
             <button
