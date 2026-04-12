@@ -284,24 +284,24 @@ export default function ProfilePage() {
                 ${(order.gstAmount || 0) > 0 ? `
                 <div class="total-row-line">
                   <span>GST (5%)</span>
-                  <span>₹${order.gstAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                  <span>₹${(order.gstAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                 </div>` : ''}
 
                 <div class="total-row-line">
                   <span>Shipping</span>
-                  <span>${(order.deliveryCharge || 0) === 0 ? "Free" : `₹${order.deliveryCharge.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}</span>
+                  <span>${(order.deliveryCharge || 0) === 0 ? "Free" : `₹${(order.deliveryCharge || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}</span>
                 </div>
 
                 ${(order.gift_wrap_charge || 0) > 0 ? `
                 <div class="total-row-line">
                   <span>Gift Wrap</span>
-                  <span>₹${order.gift_wrap_charge.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                  <span>₹${(order.gift_wrap_charge || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                 </div>` : ''}
 
                 ${(order.discountAmount || 0) > 0 ? `
                 <div class="total-row-line" style="color: #2e7d32; font-weight: 500;">
                   <span>Discount ${order.couponCode ? `(${order.couponCode})` : ''}</span>
-                  <span>-₹${order.discountAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                  <span>-₹${(order.discountAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                 </div>` : ''}
 
                 <div class="grand-total">

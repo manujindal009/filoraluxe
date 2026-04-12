@@ -1,6 +1,14 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization to prevent build-time crashes when env vars are missing
+let resend: Resend | null = null;
+const getResend = () => {
+  if (!resend) {
+    const key = process.env.RESEND_API_KEY || 're_dummy_key_for_build';
+    resend = new Resend(key);
+  }
+  return resend;
+};
 
 interface OrderConfirmationEmailProps {
   orderId: string;
@@ -19,7 +27,7 @@ export async function sendOrderConfirmationEmail({
   customerEmail,
 }: OrderConfirmationEmailProps & { customerEmail: string }) {
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'Filora Luxe <orders@filoraluxe.in>',
       to: [customerEmail],
       subject: `Order Confirmed - #${orderId} | Filora Luxe`,
