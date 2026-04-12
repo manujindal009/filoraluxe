@@ -44,11 +44,11 @@ export function Navbar() {
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex flex-col group">
-          <span className="font-serif text-2xl font-bold tracking-tight leading-none group-hover:text-rose transition-colors">
+        <Link href="/" className="flex flex-col">
+          <span className="font-serif text-xl md:text-2xl font-bold tracking-tight leading-none hover:text-rose transition-colors">
             Filora Luxe
           </span>
-          <span className="text-[10px] font-medium text-foreground/40 mt-1 tracking-[0.15em] uppercase">
+          <span className="text-[9px] font-medium text-foreground/40 mt-0.5 tracking-[0.1em] uppercase">
             a brand by anshuma
           </span>
         </Link>

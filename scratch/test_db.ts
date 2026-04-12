@@ -1,4 +1,4 @@
-import { supabase } from "./lib/supabaseClient";
+import { supabase } from "../lib/supabaseClient";
 
 async function testFetch() {
   const { data, error } = await supabase

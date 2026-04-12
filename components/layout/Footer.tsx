@@ -11,11 +11,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="md:col-span-1 border-r border-primary/50 pr-4">
-            <Link href="/" className="flex flex-col mb-4 group">
-              <span className="font-serif text-2xl font-bold tracking-tight leading-none group-hover:text-rose transition-colors">
+            <Link href="/" className="flex flex-col mb-4">
+              <span className="font-serif text-xl md:text-2xl font-bold tracking-tight leading-none hover:text-rose transition-colors">
                 Filora Luxe
               </span>
-              <span className="text-[10px] font-medium text-foreground/40 mt-1 tracking-[0.15em] uppercase">
+              <span className="text-[9px] font-medium text-foreground/40 mt-0.5 tracking-[0.1em] uppercase">
                 a brand by anshuma
               </span>
             </Link>

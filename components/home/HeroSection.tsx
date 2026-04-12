@@ -55,9 +55,8 @@ export function HeroSection() {
               <img 
                 src="https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/WhatsApp%20Image%202026-04-10%20at%2018.36.53.jpeg" 
                 alt="Filora Luxe handcrafted crochet bag" 
-                className="object-cover w-full h-full"
+                className="object-cover w-full h-full brightness-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
             </div>
             {/* Floating trust badge */}
             <motion.div 

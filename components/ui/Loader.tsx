@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils";
 interface LoaderProps {
   className?: string;
   size?: "sm" | "md" | "lg";
+  variant?: "primary" | "white";
 }
 
-export function Loader({ className, size = "md" }: LoaderProps) {
+export function Loader({ className, size = "md", variant = "primary" }: LoaderProps) {
   const sizeClasses = {
     sm: "w-4 h-4 border-2",
     md: "w-8 h-8 border-3",
@@ -17,7 +18,8 @@ export function Loader({ className, size = "md" }: LoaderProps) {
     <div className={cn("flex justify-center items-center", className)}>
       <div
         className={cn(
-          "rounded-full border-primary border-t-rose animate-spin",
+          "rounded-full border-t-rose animate-spin",
+          variant === "primary" ? "border-primary" : "border-white/30 border-t-white",
           sizeClasses[size]
         )}
       />

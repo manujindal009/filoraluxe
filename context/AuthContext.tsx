@@ -9,6 +9,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string, phone: string) => Promise<void>;
+  resendVerification: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   isAdmin: boolean;
 }
@@ -108,20 +109,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    const cleanEmail = email.trim();
+    const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+    
+    if (error) {
+      if (error.message.includes("Email not confirmed")) {
+        throw new Error("unverified");
+      }
+      throw error;
+    }
   };
 
   const register = async (email: string, password: string, name: string, phone: string) => {
+    const cleanEmail = email.trim();
+    const cleanName = name.trim();
+    const cleanPhone = phone.replace(/\D/g, "");
+
     const { error } = await supabase.auth.signUp({
-      email,
+      email: cleanEmail,
       password,
       options: {
         data: {
-          full_name: name,
-          phone: phone,
+          full_name: cleanName,
+          phone: cleanPhone,
         }
       }
+    });
+    if (error) throw error;
+  };
+
+  const resendVerification = async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email.trim(),
     });
     if (error) throw error;
   };
@@ -134,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = user?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, isAdmin }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, isAdmin, resendVerification } as any}>
       {children}
     </AuthContext.Provider>
   );

@@ -50,7 +50,7 @@ export default function CustomOrderPage() {
           uploadedUrl = await uploadFile(formData.imageFile, "custom-order-images");
         } catch (uploadErr) {
           console.error("Upload failed, showing fallback:", uploadErr);
-          addToast("Image upload failed. You can send it via WhatsApp instead.", "warning");
+          addToast("Image upload failed. You can send it via WhatsApp instead.", "info");
           // We continue anyway, they can send via WhatsApp
         }
       }
