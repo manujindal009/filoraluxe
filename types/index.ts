@@ -59,7 +59,7 @@ export interface Order {
   recipientName?: string;
   isForSomeoneElse?: boolean;
   recipientPhone?: string;
-  giftWrapCharge?: number;
+  gift_wrap_charge?: number;
   couponCode?: string;
   couponOwner?: string;
   status: 'pending' | 'processing' | 'shipped' | 'delivered';

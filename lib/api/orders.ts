@@ -201,7 +201,7 @@ export async function fetchUserOrders(userId: string): Promise<Order[]> {
     isForSomeoneElse: o.is_for_someone_else,
     recipientPhone: o.recipient_phone,
     utrNumber: o.utr_number,
-    giftWrapCharge: o.gift_wrap_charge,
+    gift_wrap_charge: o.gift_wrap_charge,
     couponCode: o.coupon_code,
     discountAmount: o.discount_amount,
     finalAmount: o.final_amount,
