@@ -92,9 +92,19 @@ BEGIN
   VALUES (
     new.id, 
     new.email, 
-    COALESCE(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
-    'user' -- FIX: Default to 'user' role for security.
-  );
+    COALESCE(
+      new.raw_user_meta_data->>'full_name', 
+      new.raw_user_meta_data->>'name',
+      split_part(new.email, '@', 1)
+    ),
+    CASE 
+      WHEN new.email IN ('filoraluxe@yahoo.com', 'manu.jindal2107@gmail.com') THEN 'admin'
+      ELSE 'user'
+    END
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    name = COALESCE(profiles.name, EXCLUDED.name);
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
