@@ -73,8 +73,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 md:px-6 py-20 flex justify-center items-center flex-1 min-h-[70vh]">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl border border-secondary shadow-sm">
+    <div className="container mx-auto px-4 md:px-6 py-10 md:py-20 flex justify-center items-center flex-1 min-h-[70vh]">
+      <div className="w-full max-w-md bg-white p-6 md:p-8 rounded-xl border border-secondary shadow-sm">
         <h1 className="text-3xl font-serif font-semibold text-center mb-6">Welcome Back</h1>
         <p className="text-center text-foreground/60 mb-8 text-sm text-balance">
           Sign in to access your orders and request custom crochet pieces.

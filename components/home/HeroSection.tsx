@@ -22,11 +22,11 @@ export function HeroSection() {
             <span className="text-rose font-medium tracking-wider uppercase text-sm mb-4">
               New Collection
             </span>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-semibold text-foreground mb-6 leading-[1.1] text-balance">
+            <h1 className="text-3xl md:text-6xl lg:text-7xl font-serif font-semibold text-foreground mb-6 leading-[1.2] md:leading-[1.1] text-balance">
               Handcrafted <br className="hidden md:block"/> 
               <span className="italic font-light">elegance</span> for your <br className="hidden md:block"/> everyday.
             </h1>
-            <p className="text-foreground/70 text-lg md:text-xl mb-10 max-w-lg mx-auto md:mx-0 text-balance">
+            <p className="text-foreground/70 text-base md:text-xl mb-10 max-w-lg mx-auto md:mx-0 text-balance">
               Discover our premium collection of minimal, beautifully crocheted pieces designed to elevate your lifestyle.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">

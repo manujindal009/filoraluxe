@@ -96,8 +96,8 @@ export default function RegisterPage() {
 
   if (verificationSent) {
     return (
-      <div className="container mx-auto px-4 md:px-6 py-20 flex justify-center items-center flex-1 min-h-[70vh]">
-        <div className="w-full max-w-md bg-white p-8 rounded-xl border border-secondary shadow-lg text-center">
+      <div className="container mx-auto px-4 md:px-6 py-10 md:py-20 flex justify-center items-center flex-1 min-h-[70vh]">
+        <div className="w-full max-w-md bg-white p-6 md:p-8 rounded-xl border border-secondary shadow-lg text-center">
           <div className="w-16 h-16 bg-rose/10 rounded-full flex items-center justify-center mx-auto mb-6 text-rose">
             <Mail className="w-8 h-8" />
           </div>
@@ -126,8 +126,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 md:px-6 py-20 flex justify-center items-center flex-1 min-h-[70vh]">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl border border-secondary shadow-sm">
+    <div className="container mx-auto px-4 md:px-6 py-10 md:py-20 flex justify-center items-center flex-1 min-h-[70vh]">
+      <div className="w-full max-w-md bg-white p-6 md:p-8 rounded-xl border border-secondary shadow-sm">
         <h1 className="text-3xl font-serif font-semibold text-center mb-6">Create Account</h1>
         <p className="text-center text-foreground/60 mb-8 text-sm">
           Join Filora Luxe for a premium, personalized experience.

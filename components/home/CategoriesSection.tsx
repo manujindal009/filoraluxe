@@ -20,7 +20,7 @@ export function CategoriesSection() {
             <Link 
               key={category.id} 
               href={`/shop?category=${category.slug}`}
-              className="group relative h-[280px] md:h-[350px] rounded-xl overflow-hidden block"
+              className="group relative h-[220px] md:h-[350px] rounded-xl overflow-hidden block"
             >
               <img 
                 src={category.image} 
