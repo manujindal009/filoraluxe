@@ -13,6 +13,7 @@ interface DiagnosticData {
     role: string;
   };
   totalOrders: number;
+  ordersAudit?: any[];
   orphanedOrders: any[];
   userOrders: any[];
   profileStatus: {
@@ -198,6 +199,62 @@ export default function DiagnosticsPage() {
                 </div>
               </div>
             )}
+
+            {/* NEW: Global Forensic Audit */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                <h2 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                  <Search className="w-4 h-4" /> Global Database Forensic Audit
+                </h2>
+                <span className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">
+                  Master Record List
+                </span>
+              </div>
+              <div className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-[11px] border-collapse">
+                    <thead className="bg-slate-50 border-b border-slate-200">
+                      <tr>
+                        <th className="px-6 py-3 font-bold text-slate-500 uppercase">Order ID</th>
+                        <th className="px-6 py-3 font-bold text-slate-500 uppercase">Profile Link</th>
+                        <th className="px-6 py-3 font-bold text-slate-500 uppercase">Linked Identity</th>
+                        <th className="px-6 py-3 font-bold text-slate-500 uppercase">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(data?.ordersAudit || []).map((order: any) => (
+                        <tr key={order.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                          <td className="px-6 py-4 font-mono text-slate-800 font-medium">{order.id}</td>
+                          <td className="px-6 py-4">
+                            {order.profileFound ? (
+                              <div className="flex items-center gap-1.5 text-emerald-600 font-bold uppercase text-[9px]">
+                                <CheckCircle2 className="w-3 h-3" /> Linked
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1.5 text-rose-600 font-bold uppercase text-[9px]">
+                                <AlertCircle className="w-3 h-3" /> Orphaned
+                              </div>
+                            )}
+                            <div className="text-[9px] text-slate-400 font-mono mt-0.5 mt-1 border border-slate-100 p-1 rounded bg-slate-50 inline-block max-w-[120px] truncate">
+                              {order.user_id || "NULL"}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="font-semibold text-slate-700">{order.linkedName || "N/A"}</div>
+                            <div className="text-[10px] text-slate-400 italic">{order.linkedEmail || "No profile linked"}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[9px] font-bold uppercase">
+                              {order.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

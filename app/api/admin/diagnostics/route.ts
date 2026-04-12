@@ -43,13 +43,18 @@ export async function GET(request: Request) {
 
     if (ordersError) throw ordersError;
 
-    // 3. Identify orphaned orders (those with user_id that doesn't exist in profiles)
-    const { data: allProfiles } = await supabaseAdmin.from("profiles").select("id");
-    const profileIds = new Set(allProfiles?.map(p => p.id) || []);
+    // 3. Identify orphaned orders and list ALL orders for forensic audit
+    const { data: allProfiles } = await supabaseAdmin.from("profiles").select("id, email, name");
+    const profileMap = new Map(allProfiles?.map(p => [p.id, p]) || []);
 
-    const orphanedOrders = allOrders.filter(order => 
-      !order.user_id || !profileIds.has(order.user_id)
-    );
+    const ordersAudit = allOrders.map(order => ({
+      ...order,
+      profileFound: profileMap.has(order.user_id),
+      linkedEmail: profileMap.get(order.user_id)?.email,
+      linkedName: profileMap.get(order.user_id)?.name
+    }));
+
+    const orphanedOrders = ordersAudit.filter(o => !o.profileFound);
 
     // 4. Fetch the specific orders for the current user
     const userOrders = allOrders.filter(order => order.user_id === currentUser.id);
@@ -61,10 +66,11 @@ export async function GET(request: Request) {
         role: profile?.role
       },
       totalOrders: allOrders.length,
+      ordersAudit,
       orphanedOrders,
       userOrders,
       profileStatus: {
-        exists: profileIds.has(currentUser.id),
+        exists: profileMap.has(currentUser.id),
         data: profile
       }
     });

@@ -119,7 +119,19 @@ export async function placeOrder(
 }
 
 export async function fetchUserOrders(userId: string): Promise<Order[]> {
-  const { data, error } = await supabase
+  // Deep-dive logging for visibility gap forensics
+  const { data: authData } = await supabase.auth.getUser();
+  const sessionUser = authData?.user;
+  
+  console.log(`[fetchUserOrders] --- START DEBUG ---`);
+  console.log(`[fetchUserOrders] Param UserID: ${userId}`);
+  console.log(`[fetchUserOrders] Auth Session UID: ${sessionUser?.id || "NO ACTIVE SESSION"}`);
+  console.log(`[fetchUserOrders] Auth Email: ${sessionUser?.email || "N/A"}`);
+
+  // Force cast userId to string and trim to be safe
+  const targetId = String(userId).trim();
+
+  let { data, error } = await supabase
     .from('orders')
     .select(`
       *,
@@ -130,21 +142,40 @@ export async function fetchUserOrders(userId: string): Promise<Order[]> {
         products!product_id (name)
       )
     `)
-    .eq('user_id', userId)
+    .eq('user_id', targetId)
     .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error(`[fetchUserOrders] Failed for User ${userId}. Error details:`, JSON.stringify(error, null, 2));
-    // If error.code is 42501, it's a Permission Denied (RLS) issue
-    if (error.code === '42501') {
-      console.warn(`[fetchUserOrders] RLS Policy is blocking access for User ${userId}`);
+  // FALLBACK: If join fails or returns 42501 (Permission Denied), try a simple orders fetch
+  if (error || (!data || data.length === 0)) {
+    console.log(`[fetchUserOrders] Primary query result: ${data?.length || 0} rows. Error: ${error?.message || "None"}`);
+    
+    // Check if it's a permission issue or just no data
+    if (error?.code === '42501' || !data || data.length === 0) {
+      console.warn(`[fetchUserOrders] Entering FALLBACK mode for user ${targetId}...`);
+      const { data: simpleData, error: simpleError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', targetId)
+        .order('created_at', { ascending: false });
+      
+      if (!simpleError && simpleData && simpleData.length > 0) {
+        console.log(`[fetchUserOrders] FALLBACK SUCCESS: Found ${simpleData.length} orders via simple query.`);
+        data = simpleData;
+      } else if (simpleError) {
+        console.error(`[fetchUserOrders] FALLBACK FAILED. Simple Error: ${simpleError.message}`);
+        error = simpleError;
+      }
     }
+  }
+
+  if (error) {
+    console.error(`[fetchUserOrders] FINAL DB Error: `, JSON.stringify(error, null, 2));
     return [];
   }
 
-  console.log(`[fetchUserOrders] Successfully loaded ${data?.length || 0} orders for User ${userId}`);
-
-  return data.map(o => ({
+  console.log(`[fetchUserOrders] Returning ${data?.length || 0} orders to UI.`);
+  
+  return (data || []).map((o: any) => ({
     id: o.id,
     userId: o.user_id,
     items: (o.order_items || []).map((oi: any) => ({
@@ -203,7 +234,7 @@ export async function fetchAllOrders(): Promise<Order[]> {
     isForSomeoneElse: o.is_for_someone_else,
     recipientPhone: o.recipient_phone,
     utrNumber: o.utr_number,
-    giftWrapCharge: o.gift_wrap_charge,
+    gift_wrap_charge: o.gift_wrap_charge,
     couponCode: o.coupon_code,
     discountAmount: o.discount_amount,
     finalAmount: o.final_amount,
@@ -239,7 +270,7 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'pr
     isForSomeoneElse: data.is_for_someone_else,
     recipientPhone: data.recipient_phone,
     utrNumber: data.utr_number,
-    giftWrapCharge: data.gift_wrap_charge,
+    gift_wrap_charge: data.gift_wrap_charge,
     couponCode: data.coupon_code,
     discountAmount: data.discount_amount,
     finalAmount: data.final_amount,

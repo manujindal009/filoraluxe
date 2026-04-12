@@ -162,6 +162,12 @@ export default function CheckoutPage() {
             setIsVerifyingPayment(true);
             
             // 3. Verify Payment on server (This creates the order in DB and sends email)
+            if (!user?.id) {
+              console.error("[RazorpayVerify] CRITICAL: User context lost during payment callback!");
+              addToast("Your session has expired. Please log in again to save your order.", "error");
+              return;
+            }
+
             const verifyRes = await fetch("/api/razorpay/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },

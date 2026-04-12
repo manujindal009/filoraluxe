@@ -35,6 +35,11 @@ export async function POST(req: Request) {
 
     console.log(`[RazorpayVerify] Signature Valid. Creating DB Order: ${newOrderId} for User: ${userId}`);
 
+    if (!userId) {
+      console.error(`[RazorpayVerify] CRITICAL: Missing userId for order ${newOrderId}`);
+      return NextResponse.json({ error: "Unauthorized: Missing User Identity" }, { status: 400 });
+    }
+
     // 3. Insert Order into Supabase (Using Admin Client to bypass RLS)
     const { data: orderData, error: orderError } = await supabase
       .from('orders')
