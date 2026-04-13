@@ -95,7 +95,12 @@ export async function POST(req: Request) {
           total: couponDetails?.finalAmount || total,
           address: `${shippingDetails.street}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.zipCode}`,
           customerEmail: customerEmail,
-          paymentMethod: 'cod'
+          paymentMethod: 'cod',
+          subtotal: total,
+          shipping: options.deliveryCharge,
+          tax: options.gstAmount,
+          discount: couponDetails?.discountAmount || 0,
+          giftWrap: options.gift_wrap_charge || 0
         });
 
         if (emailResponse.success) {

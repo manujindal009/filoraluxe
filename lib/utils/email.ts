@@ -17,6 +17,11 @@ interface OrderConfirmationEmailProps {
   total: number;
   address: string;
   paymentMethod?: string;
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  discount: number;
+  giftWrap: number;
 }
 
 export async function sendOrderConfirmationEmail({
@@ -27,10 +32,18 @@ export async function sendOrderConfirmationEmail({
   address,
   customerEmail,
   paymentMethod = 'razorpay',
+  subtotal,
+  shipping,
+  tax,
+  discount,
+  giftWrap,
 }: OrderConfirmationEmailProps & { customerEmail: string }) {
   const isCOD = paymentMethod.toLowerCase() === 'cod';
   const paymentStatusText = isCOD ? "Cash on Delivery" : "Paid ✅";
   const paymentStatusColor = isCOD ? "#f59e0b" : "#10b981"; // Amber for COD, Green for Paid
+  
+  // Dynamic color for Total Amount as requested: Red for COD, Green for Paid
+  const totalAmountColor = isCOD ? "#E11D48" : "#10b981";
 
   try {
     const { data, error } = await getResend().emails.send({
@@ -102,9 +115,37 @@ export async function sendOrderConfirmationEmail({
                         <td align="right" style="padding: 16px 0; font-size: 14px;">₹${(item.product.price * item.quantity).toLocaleString()}</td>
                       </tr>
                     `).join('')}
+                    
+                    <!-- Price Breakdown -->
                     <tr>
-                      <td colspan="2" align="right" style="padding: 20px 0 0 0; font-size: 16px; font-weight: 500;">${isCOD ? 'Total Amount' : 'Total Paid'}</td>
-                      <td align="right" style="padding: 20px 0 0 0; font-size: 18px; font-weight: 600; color: #E11D48;">₹${total.toLocaleString()}</td>
+                      <td colspan="2" align="right" style="padding: 20px 10px 5px 0; font-size: 14px; color: #6b7280;">Subtotal</td>
+                      <td align="right" style="padding: 20px 0 5px 0; font-size: 14px;">₹${subtotal.toLocaleString()}</td>
+                    </tr>
+                    ${discount > 0 ? `
+                    <tr>
+                      <td colspan="2" align="right" style="padding: 5px 10px 5px 0; font-size: 14px; color: #10b981;">Discount</td>
+                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px; color: #10b981;">-₹${discount.toLocaleString()}</td>
+                    </tr>
+                    ` : ''}
+                    <tr>
+                      <td colspan="2" align="right" style="padding: 5px 10px 5px 0; font-size: 14px; color: #6b7280;">Shipping</td>
+                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px;">${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString()}`}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" align="right" style="padding: 5px 10px 5px 0; font-size: 14px; color: #6b7280;">GST (5%)</td>
+                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px;">₹${tax.toLocaleString()}</td>
+                    </tr>
+                    ${giftWrap > 0 ? `
+                    <tr>
+                      <td colspan="2" align="right" style="padding: 5px 10px 5px 0; font-size: 14px; color: #6b7280;">Gift Wrap</td>
+                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px;">₹${giftWrap.toLocaleString()}</td>
+                    </tr>
+                    ` : ''}
+                    
+                    <!-- Grand Total -->
+                    <tr>
+                      <td colspan="2" align="right" style="padding: 15px 10px 0 0; font-size: 16px; font-weight: 500;">${isCOD ? 'Total Amount to Pay' : 'Total Paid'}</td>
+                      <td align="right" style="padding: 15px 0 0 0; font-size: 20px; font-weight: 600; color: ${totalAmountColor};">₹${total.toLocaleString()}</td>
                     </tr>
                   </tbody>
                 </table>
