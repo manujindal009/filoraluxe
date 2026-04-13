@@ -8,8 +8,8 @@ import { useCart } from "@/context/CartContext";
 export function CartSummary() {
   const { total, itemCount } = useCart();
   
-    // Calculate shipping (free over ₹1000)
-    const shipping = total > 1000 ? 0 : 80;
+    // Calculate shipping (free over ₹799)
+    const shipping = total > 799 ? 0 : 80;
   const grandTotal = total + shipping;
 
   return (
@@ -40,7 +40,7 @@ export function CartSummary() {
         </div>
         {shipping > 0 && (
           <p className="text-xs text-foreground/50 mt-2 text-right">
-            Spend {formatPrice(1000 - total)} more for free shipping
+            Spend {formatPrice(799 - total)} more for free shipping
           </p>
         )}
       </div>
