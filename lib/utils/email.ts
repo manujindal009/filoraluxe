@@ -45,6 +45,14 @@ export async function sendOrderConfirmationEmail({
   // Dynamic color for Total Amount as requested: Red for COD, Green for Paid
   const totalAmountColor = isCOD ? "#E11D48" : "#10b981";
 
+  // Safety: Ensure all numeric values are valid numbers to prevent toLocaleString() crashes
+  const sSubtotal = Number(subtotal) || 0;
+  const sShipping = Number(shipping) || 0;
+  const sTax = Number(tax) || 0;
+  const sDiscount = Number(discount) || 0;
+  const sGiftWrap = Number(giftWrap) || 0;
+  const sTotal = Number(total) || 0;
+
   try {
     const { data, error } = await getResend().emails.send({
       from: 'Filora Luxe <orders@filoraluxe.in>',
@@ -69,7 +77,7 @@ export async function sendOrderConfirmationEmail({
             <tr>
               <td align="center" style="padding: 40px 20px 20px 20px; border-bottom: 1px solid #f3f4f6;">
                 <h1 style="margin: 0; font-size: 36px; font-weight: 500; letter-spacing: 2px; color: #E11D48; text-transform: uppercase;">Filora Luxe</h1>
-                <p style="margin: 8px 0 0 0; font-size: 14px; letter-spacing: 4px; color: #6b7280; font-style: italic; text-transform: lowercase;">A Brand by Anshuma</p>
+                <p style="margin: 8px 0 0 0; font-size: 14px; letter-spacing: 4px; color: #6b7280; font-style: italic;">A Brand by Anshuma</p>
               </td>
             </tr>
 
@@ -119,33 +127,33 @@ export async function sendOrderConfirmationEmail({
                     <!-- Price Breakdown -->
                     <tr>
                       <td colspan="2" align="right" style="padding: 20px 10px 5px 0; font-size: 14px; color: #6b7280;">Subtotal</td>
-                      <td align="right" style="padding: 20px 0 5px 0; font-size: 14px;">₹${subtotal.toLocaleString()}</td>
+                      <td align="right" style="padding: 20px 0 5px 0; font-size: 14px;">₹${sSubtotal.toLocaleString()}</td>
                     </tr>
-                    ${discount > 0 ? `
+                    ${sDiscount > 0 ? `
                     <tr>
                       <td colspan="2" align="right" style="padding: 5px 10px 5px 0; font-size: 14px; color: #10b981;">Discount</td>
-                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px; color: #10b981;">-₹${discount.toLocaleString()}</td>
+                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px; color: #10b981;">-₹${sDiscount.toLocaleString()}</td>
                     </tr>
                     ` : ''}
                     <tr>
                       <td colspan="2" align="right" style="padding: 5px 10px 5px 0; font-size: 14px; color: #6b7280;">Shipping</td>
-                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px;">${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString()}`}</td>
+                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px;">${sShipping === 0 ? 'FREE' : `₹${sShipping.toLocaleString()}`}</td>
                     </tr>
                     <tr>
                       <td colspan="2" align="right" style="padding: 5px 10px 5px 0; font-size: 14px; color: #6b7280;">GST (5%)</td>
-                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px;">₹${tax.toLocaleString()}</td>
+                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px;">₹${sTax.toLocaleString()}</td>
                     </tr>
-                    ${giftWrap > 0 ? `
+                    ${sGiftWrap > 0 ? `
                     <tr>
                       <td colspan="2" align="right" style="padding: 5px 10px 5px 0; font-size: 14px; color: #6b7280;">Gift Wrap</td>
-                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px;">₹${giftWrap.toLocaleString()}</td>
+                      <td align="right" style="padding: 5px 0 5px 0; font-size: 14px;">₹${sGiftWrap.toLocaleString()}</td>
                     </tr>
                     ` : ''}
                     
                     <!-- Grand Total -->
                     <tr>
                       <td colspan="2" align="right" style="padding: 15px 10px 0 0; font-size: 16px; font-weight: 500;">${isCOD ? 'Total Amount to Pay' : 'Total Paid'}</td>
-                      <td align="right" style="padding: 15px 0 0 0; font-size: 20px; font-weight: 600; color: ${totalAmountColor};">₹${total.toLocaleString()}</td>
+                      <td align="right" style="padding: 15px 0 0 0; font-size: 20px; font-weight: 600; color: ${totalAmountColor};">₹${sTotal.toLocaleString()}</td>
                     </tr>
                   </tbody>
                 </table>
