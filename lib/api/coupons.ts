@@ -31,6 +31,7 @@ export async function validateCoupon(code: string): Promise<CouponValidationResu
     expiryDate: data.expiry_date,
     maxUsage: data.max_usage,
     usedCount: data.used_count,
+    isFreeShipping: data.is_free_shipping,
     createdAt: data.created_at
   };
 
@@ -68,6 +69,7 @@ export async function fetchAllCoupons(): Promise<Coupon[]> {
     expiryDate: c.expiry_date,
     maxUsage: c.max_usage,
     usedCount: c.used_count,
+    isFreeShipping: c.is_free_shipping,
     createdAt: c.created_at
   }));
 }
@@ -80,7 +82,8 @@ export async function createCoupon(payload: Omit<Coupon, 'id' | 'usedCount' | 'c
       discount_percentage: payload.discountPercentage,
       owner_name: payload.ownerName,
       expiry_date: payload.expiryDate,
-      max_usage: payload.maxUsage
+      max_usage: payload.maxUsage,
+      is_free_shipping: payload.isFreeShipping || false
     }])
     .select()
     .single();

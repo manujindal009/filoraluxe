@@ -6,6 +6,7 @@ export interface Coupon {
   expiryDate: string;
   maxUsage: number;
   usedCount: number;
+  isFreeShipping?: boolean;
   createdAt?: string;
 }
 

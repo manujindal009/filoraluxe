@@ -79,6 +79,11 @@ export default function CheckoutPage() {
     deliveryCharge = total > 799 ? 0 : 80;
   }
 
+  // Override if Free Shipping Coupon is applied
+  if (activeCoupon?.isFreeShipping) {
+    deliveryCharge = 0;
+  }
+
   // 2. Calculate Discount
   const discount = activeCoupon ? (total * (activeCoupon.discountPercentage / 100)) : 0;
   const discountedSubtotal = total - discount;
@@ -359,7 +364,7 @@ export default function CheckoutPage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     className="w-full border border-secondary rounded-md px-4 py-2 bg-white text-sm focus:ring-1 focus:ring-rose focus:border-rose outline-none"
-                    placeholder="+91 98888 12345"
+                    placeholder="9876543210"
                   />
                 </div>
                 <div>

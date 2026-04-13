@@ -26,6 +26,7 @@ export default function AdminCouponsPage() {
     ownerName: "",
     expiryDate: "",
     maxUsage: "100",
+    isFreeShipping: false,
   });
 
   useEffect(() => {
@@ -55,11 +56,12 @@ export default function AdminCouponsPage() {
         ownerName: newCoupon.ownerName,
         expiryDate: new Date(newCoupon.expiryDate).toISOString(),
         maxUsage: parseInt(newCoupon.maxUsage),
+        isFreeShipping: newCoupon.isFreeShipping,
       });
       setCoupons([created, ...coupons]);
       addToast(`Coupon ${created.code} created!`, "success");
       setIsModalOpen(false);
-      setNewCoupon({ code: "", discountPercentage: "", ownerName: "", expiryDate: "", maxUsage: "100" });
+      setNewCoupon({ code: "", discountPercentage: "", ownerName: "", expiryDate: "", maxUsage: "100", isFreeShipping: false });
     } catch {
       addToast("Failed to create coupon", "error");
     } finally {
@@ -191,9 +193,15 @@ export default function AdminCouponsPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className="bg-primary/20 text-foreground px-2 py-1 rounded text-xs font-semibold">
-                            {coupon.discountPercentage}% OFF
-                          </span>
+                          {coupon.isFreeShipping ? (
+                            <span className="bg-sage/20 text-sage px-2 py-1 rounded text-xs font-semibold">
+                              FREE SHIPPING
+                            </span>
+                          ) : (
+                            <span className="bg-primary/20 text-foreground px-2 py-1 rounded text-xs font-semibold">
+                              {coupon.discountPercentage}% OFF
+                            </span>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col gap-1 min-w-[120px]">
@@ -270,17 +278,38 @@ export default function AdminCouponsPage() {
                 />
               </div>
 
+              <div className="flex items-center gap-3 p-3 bg-secondary/30 rounded-lg mb-2">
+                <input
+                  type="checkbox"
+                  id="isFreeShipping"
+                  checked={newCoupon.isFreeShipping}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setNewCoupon({ 
+                      ...newCoupon, 
+                      isFreeShipping: checked,
+                      discountPercentage: checked ? "0" : newCoupon.discountPercentage
+                    });
+                  }}
+                  className="w-4 h-4 rounded border-secondary text-rose focus:ring-rose"
+                />
+                <label htmlFor="isFreeShipping" className="text-sm font-medium text-foreground cursor-pointer">
+                  This coupon provides **Free Shipping**
+                </label>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground/80 mb-1">Discount %</label>
                   <input
                     required
                     type="number"
-                    min="1"
+                    min="0"
                     max="100"
+                    disabled={newCoupon.isFreeShipping}
                     value={newCoupon.discountPercentage}
                     onChange={(e) => setNewCoupon({ ...newCoupon, discountPercentage: e.target.value })}
-                    className="w-full border border-secondary rounded-md px-4 py-2 focus:ring-1 focus:ring-rose focus:border-rose outline-none"
+                    className="w-full border border-secondary rounded-md px-4 py-2 focus:ring-1 focus:ring-rose focus:border-rose outline-none disabled:bg-secondary/30 disabled:text-foreground/40"
                     placeholder="e.g. 20"
                   />
                 </div>
