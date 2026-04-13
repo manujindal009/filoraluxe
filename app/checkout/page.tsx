@@ -76,7 +76,7 @@ export default function CheckoutPage() {
   if (isTricity) {
     deliveryCharge = total > 499 ? 0 : 50;
   } else {
-    deliveryCharge = total > 1000 ? 0 : 100;
+    deliveryCharge = total > 1000 ? 0 : 80;
   }
 
   // 2. Calculate Discount

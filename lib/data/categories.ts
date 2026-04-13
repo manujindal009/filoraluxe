@@ -13,7 +13,23 @@ export const categories: Category[] = [
     name: "Accessories",
     slug: "accessories",
     description: "Wearable crochet pieces for every season.",
-    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/accsessory.jpeg"
+    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/accsessory.jpeg",
+    subcategories: [
+      {
+        id: "c1000000-0000-0000-0000-000000000101",
+        categoryId: "c1000000-0000-0000-0000-000000000002",
+        name: "Clips",
+        slug: "clips",
+        description: "Beautifiul handmade crochet hair clips."
+      },
+      {
+        id: "c1000000-0000-0000-0000-000000000102",
+        categoryId: "c1000000-0000-0000-0000-000000000002",
+        name: "Hairbands",
+        slug: "hairbands",
+        description: "Elegant and comfortable crochet hairbands."
+      }
+    ]
   },
   {
     id: "c1000000-0000-0000-0000-000000000003",
