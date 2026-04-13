@@ -119,11 +119,17 @@ export default function AdminDashboardPage() {
           {stats?.topProduct ? (
             <div className="w-full">
               <div className="aspect-[4/5] rounded-lg bg-secondary overflow-hidden mb-4 relative">
-                <img 
-                  src={stats.topProduct.image} 
-                  alt={stats.topProduct.name} 
-                  className="w-full h-full object-cover"
-                />
+                {stats.topProduct.image ? (
+                  <img 
+                    src={stats.topProduct.image} 
+                    alt={stats.topProduct.name} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-foreground/20">
+                    No image
+                  </div>
+                )}
                 <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded text-xs font-bold text-foreground">
                   TOP
                 </div>
