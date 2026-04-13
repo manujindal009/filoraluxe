@@ -84,6 +84,10 @@ export async function fetchAdminStats(): Promise<DashboardStats> {
         created_at, 
         total, 
         final_amount,
+        delivery_charge,
+        gst_amount,
+        discount_amount,
+        gift_wrap_charge,
         status, 
         profiles!user_id (email, name)
       `)
