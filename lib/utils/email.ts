@@ -202,3 +202,65 @@ export async function sendOrderConfirmationEmail({
     return { success: false, error: err };
   }
 }
+
+export async function sendPasswordResetEmail(email: string, name: string, resetLink: string) {
+  try {
+    const { data, error } = await getResend().emails.send({
+      from: 'Filora Luxe <auth@filoraluxe.in>',
+      to: [email],
+      subject: 'Reset your password - Filora Luxe',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: 'Times New Roman', serif; color: #1a1a1a;">
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; border: 1px solid #f3f4f6;">
+            <tr>
+              <td align="center" style="padding: 40px 20px; border-bottom: 1px solid #f3f4f6;">
+                <h1 style="margin: 0; font-size: 32px; font-weight: 500; letter-spacing: 2px; color: #E11D48; text-transform: uppercase;">Filora Luxe</h1>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 40px;">
+                <h2 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 500;">Password Reset Request</h2>
+                <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">
+                  Hi ${name}, <br/><br/>
+                  We received a request to reset the password for your Filora Luxe account. Click the button below to set a new password:
+                </p>
+                
+                <div style="text-align: center; margin: 40px 0;">
+                  <a href="${resetLink}" style="background-color: #1a1a1a; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Reset Password</a>
+                </div>
+
+                <p style="margin: 30px 0 0 0; font-size: 14px; line-height: 1.6; color: #9ca3af;">
+                  If you didn't request a password reset, you can safely ignore this email. This link will expire in 24 hours.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding: 30px 20px; background-color: #fafafa; border-top: 1px solid #f3f4f6;">
+                <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                  © 2026 Filora Luxe. Handcrafted with ❤️ in India.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `
+    });
+
+    if (error) {
+      console.error("Resend Reset Email Error:", error);
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Resend reset unexpected error:", err);
+    return { success: false, error: err };
+  }
+}
