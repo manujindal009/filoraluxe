@@ -79,14 +79,17 @@ export default function CheckoutPage() {
     deliveryCharge = total > 1000 ? 0 : 100;
   }
 
-  // 2. Calculate GST (5%)
-  const gstAmount = total * 0.05;
+  // 2. Calculate Discount
+  const discount = activeCoupon ? (total * (activeCoupon.discountPercentage / 100)) : 0;
+  const discountedSubtotal = total - discount;
 
-  // 3. Gift Wrap Charge
+  // 3. Calculate GST (5%) on discounted subtotal
+  const gstAmount = discountedSubtotal * 0.05;
+
+  // 4. Gift Wrap Charge
   const giftWrapCharge = formData.isGift ? GIFT_WRAP_FEE : 0;
 
-  const discount = activeCoupon ? (total * (activeCoupon.discountPercentage / 100)) : 0;
-  const grandTotal = total - discount + deliveryCharge + gstAmount + giftWrapCharge;
+  const grandTotal = discountedSubtotal + deliveryCharge + gstAmount + giftWrapCharge;
 
   // 3. Pincode Autofill Logic
   const fetchPostalData = async (pincode: string) => {
