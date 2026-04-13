@@ -69,7 +69,7 @@ export async function sendOrderConfirmationEmail({
             <tr>
               <td align="center" style="padding: 40px 20px 20px 20px; border-bottom: 1px solid #f3f4f6;">
                 <h1 style="margin: 0; font-size: 36px; font-weight: 500; letter-spacing: 2px; color: #E11D48; text-transform: uppercase;">Filora Luxe</h1>
-                <p style="margin: 8px 0 0 0; font-size: 14px; letter-spacing: 4px; color: #6b7280; font-style: italic; text-transform: lowercase;">a brand by anshuma</p>
+                <p style="margin: 8px 0 0 0; font-size: 14px; letter-spacing: 4px; color: #6b7280; font-style: italic; text-transform: lowercase;">A Brand by Anshuma</p>
               </td>
             </tr>
 

@@ -33,7 +33,7 @@ export default function ShippingPage() {
             </li>
             <li className="flex justify-between border-t border-secondary pt-3">
               <span className="font-medium">Free shipping on orders above</span>
-              <span className="font-semibold text-sage">₹1,500</span>
+              <span className="font-semibold text-sage">₹799</span>
             </li>
           </ul>
           <p className="text-xs text-foreground/50">Processing time: 1–2 business days before dispatch.</p>
