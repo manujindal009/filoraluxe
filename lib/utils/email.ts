@@ -16,6 +16,7 @@ interface OrderConfirmationEmailProps {
   items: any[];
   total: number;
   address: string;
+  paymentMethod?: string;
 }
 
 export async function sendOrderConfirmationEmail({
@@ -25,7 +26,12 @@ export async function sendOrderConfirmationEmail({
   total,
   address,
   customerEmail,
+  paymentMethod = 'razorpay',
 }: OrderConfirmationEmailProps & { customerEmail: string }) {
+  const isCOD = paymentMethod.toLowerCase() === 'cod';
+  const paymentStatusText = isCOD ? "Cash on Delivery" : "Paid ✅";
+  const paymentStatusColor = isCOD ? "#f59e0b" : "#10b981"; // Amber for COD, Green for Paid
+
   try {
     const { data, error } = await getResend().emails.send({
       from: 'Filora Luxe <orders@filoraluxe.in>',
@@ -74,7 +80,7 @@ export async function sendOrderConfirmationEmail({
                     </td>
                     <td style="padding: 20px; text-align: right;">
                       <p style="margin: 0 0 4px 0; font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">Payment Status</p>
-                      <p style="margin: 0; font-size: 16px; font-weight: 500; color: #10b981;">Paid ✅</p>
+                      <p style="margin: 0; font-size: 16px; font-weight: 500; color: ${paymentStatusColor};">${paymentStatusText}</p>
                     </td>
                   </tr>
                 </table>
@@ -97,7 +103,7 @@ export async function sendOrderConfirmationEmail({
                       </tr>
                     `).join('')}
                     <tr>
-                      <td colspan="2" align="right" style="padding: 20px 0 0 0; font-size: 16px; font-weight: 500;">Total Paid</td>
+                      <td colspan="2" align="right" style="padding: 20px 0 0 0; font-size: 16px; font-weight: 500;">${isCOD ? 'Total Amount' : 'Total Paid'}</td>
                       <td align="right" style="padding: 20px 0 0 0; font-size: 18px; font-weight: 600; color: #E11D48;">₹${total.toLocaleString()}</td>
                     </tr>
                   </tbody>

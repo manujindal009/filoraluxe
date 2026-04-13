@@ -272,29 +272,44 @@ export default function CheckoutPage() {
           country: formData.country,
         };
 
-        await placeOrder(user.id, items, shippingDetails, total, {
-          paymentMethod: 'cod',
-          deliveryCharge,
-          gstAmount,
-          gift_wrap_charge: giftWrapCharge,
-          isGift: formData.isGift,
-          giftMessage: formData.giftMessage,
-          recipientName: formData.recipientName,
-          isForSomeoneElse: formData.isForSomeoneElse,
-          recipientPhone: formData.recipientPhone,
-          couponDetails: activeCoupon ? {
-            code: activeCoupon.code,
-            discountAmount: discount,
-            finalAmount: grandTotal,
-            ownerName: activeCoupon.ownerName
-          } : undefined
+        const response = await fetch("/api/orders/cod", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: user.id,
+            items,
+            shippingDetails,
+            total,
+            options: {
+              deliveryCharge,
+              gstAmount,
+              gift_wrap_charge: giftWrapCharge,
+              isGift: formData.isGift,
+              giftMessage: formData.giftMessage,
+              recipientName: formData.recipientName,
+              isForSomeoneElse: formData.isForSomeoneElse,
+              recipientPhone: formData.recipientPhone,
+              couponDetails: activeCoupon ? {
+                code: activeCoupon.code,
+                discountAmount: discount,
+                finalAmount: grandTotal,
+                ownerName: activeCoupon.ownerName
+              } : undefined
+            }
+          })
         });
 
-        clearCart();
-        addToast("Order placed successfully (COD)!", "success");
-        router.push("/checkout/success");
-      } catch (error) {
-        addToast("Checkout failed", "error");
+        const data = await response.json();
+
+        if (data.success) {
+          clearCart();
+          addToast("Order placed successfully (COD)!", "success");
+          router.push("/checkout/success");
+        } else {
+          throw new Error(data.error || "Checkout failed");
+        }
+      } catch (error: any) {
+        addToast(error.message || "Checkout failed", "error");
         setIsProcessing(false);
       }
     }
