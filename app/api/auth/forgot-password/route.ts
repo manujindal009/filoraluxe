@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Send email via Resend
+    console.log(`[ForgotPassword] Attempting to send reset email to ${email.trim()} using orders@filoraluxe.in`);
     const emailResponse = await sendPasswordResetEmail(
       email.trim(),
       profile.name || 'Valued Customer',
@@ -44,10 +45,11 @@ export async function POST(req: NextRequest) {
     );
 
     if (!emailResponse.success) {
-      console.error('Email Send Error:', emailResponse.error);
+      console.error('[ForgotPassword] Email Send Error:', emailResponse.error);
       return NextResponse.json({ error: 'Failed to send reset email' }, { status: 500 });
     }
 
+    console.log('[ForgotPassword] Reset email accepted by Resend:', emailResponse.data);
     return NextResponse.json({ success: true, message: 'Reset link sent successfully!' });
   } catch (error: any) {
     console.error('Forgot Password API Error:', error);

@@ -206,7 +206,7 @@ export async function sendOrderConfirmationEmail({
 export async function sendPasswordResetEmail(email: string, name: string, resetLink: string) {
   try {
     const { data, error } = await getResend().emails.send({
-      from: 'Filora Luxe <auth@filoraluxe.in>',
+      from: 'Filora Luxe <orders@filoraluxe.in>',
       to: [email],
       subject: 'Reset your password - Filora Luxe',
       html: `
