@@ -93,20 +93,35 @@ export async function POST(req: Request) {
       await supabase.rpc('increment_coupon_usage', { coupon_code: couponDetails.code });
     }
 
+    const customerEmail = shippingDetails.email;
+    if (!customerEmail) {
+      console.warn(`[RazorpayVerify] Order ${newOrderId} created but email is missing from shipping details.`);
+    }
+
     // 6. Send Email Confirmation (Failsafe - don't block order success if email fails)
     try {
-      await sendOrderConfirmationEmail({
-        orderId: newOrderId,
-        customerName: shippingDetails.name,
-        items: items,
-        total: couponDetails?.finalAmount || total,
-        address: `${shippingDetails.street}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.zipCode}`,
-        customerEmail: shippingDetails.email
-      });
-      console.log(`[OrderConfirmation] Email sent successfully for order ${newOrderId}`);
+      if (customerEmail) {
+        console.log(`[RazorpayVerify] Attempting to send confirmation email to ${customerEmail}`);
+        const emailResponse = await sendOrderConfirmationEmail({
+          orderId: newOrderId,
+          customerName: shippingDetails.name,
+          items: items,
+          total: couponDetails?.finalAmount || total,
+          address: `${shippingDetails.street}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.zipCode}`,
+          customerEmail: customerEmail,
+          paymentMethod: 'razorpay'
+        });
+
+        if (emailResponse.success) {
+          console.log(`[RazorpayVerify] Email sent successfully for order ${newOrderId}`);
+        } else {
+          console.error(`[RazorpayVerify] Resend returned error for order ${newOrderId}:`, emailResponse.error);
+        }
+      } else {
+        console.warn(`[RazorpayVerify] Skipping email for order ${newOrderId} because email address is blank.`);
+      }
     } catch (emailError) {
-      console.error(`[OrderConfirmation] Failed to send email for order ${newOrderId}:`, emailError);
-      // We don't throw here to avoid failing the entire request after payment is verified
+      console.error(`[RazorpayVerify] Unexpected exception during email sending for order ${newOrderId}:`, emailError);
     }
 
     return NextResponse.json({

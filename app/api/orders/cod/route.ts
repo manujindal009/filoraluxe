@@ -79,20 +79,35 @@ export async function POST(req: Request) {
       await supabase.rpc('increment_coupon_usage', { coupon_code: couponDetails.code });
     }
 
+    const customerEmail = shippingDetails.email;
+    if (!customerEmail) {
+      console.warn(`[CODOrder] Order ${newOrderId} created but email is missing from shipping details.`);
+    }
+
     // 4. Send Email Confirmation (Failsafe - don't block order success if email fails)
     try {
-      await sendOrderConfirmationEmail({
-        orderId: newOrderId,
-        customerName: shippingDetails.name,
-        items: items,
-        total: couponDetails?.finalAmount || total,
-        address: `${shippingDetails.street}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.zipCode}`,
-        customerEmail: shippingDetails.email,
-        paymentMethod: 'cod'
-      });
-      console.log(`[CODOrder] Email sent successfully for order ${newOrderId}`);
+      if (customerEmail) {
+        console.log(`[CODOrder] Attempting to send confirmation email to ${customerEmail}`);
+        const emailResponse = await sendOrderConfirmationEmail({
+          orderId: newOrderId,
+          customerName: shippingDetails.name,
+          items: items,
+          total: couponDetails?.finalAmount || total,
+          address: `${shippingDetails.street}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.zipCode}`,
+          customerEmail: customerEmail,
+          paymentMethod: 'cod'
+        });
+
+        if (emailResponse.success) {
+          console.log(`[CODOrder] Email sent successfully for order ${newOrderId}`);
+        } else {
+          console.error(`[CODOrder] Resend returned error for order ${newOrderId}:`, emailResponse.error);
+        }
+      } else {
+        console.warn(`[CODOrder] Skipping email for order ${newOrderId} because email address is blank.`);
+      }
     } catch (emailError) {
-      console.error(`[CODOrder] Failed to send email for order ${newOrderId}:`, emailError);
+      console.error(`[CODOrder] Unexpected exception during email sending for order ${newOrderId}:`, emailError);
     }
 
     return NextResponse.json({

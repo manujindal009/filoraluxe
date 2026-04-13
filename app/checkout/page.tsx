@@ -53,6 +53,16 @@ export default function CheckoutPage() {
     // If guest tries to checkout, show the modal
     if (!user) {
       setShowAuthModal(true);
+    } else {
+      // Auto-populate form data from user profile if not already filled
+      const names = user.name ? user.name.split(" ") : ["", ""];
+      setFormData(prev => ({
+        ...prev,
+        firstName: prev.firstName || names[0] || "",
+        lastName: prev.lastName || names.slice(1).join(" ") || "",
+        email: prev.email || user.email || "",
+        phone: prev.phone || user.phone || ""
+      }));
     }
   }, [user]);
 
@@ -347,6 +357,19 @@ export default function CheckoutPage() {
                     onChange={handleInputChange}
                     className="w-full border border-secondary rounded-md px-4 py-2 bg-white text-sm focus:ring-1 focus:ring-rose focus:border-rose outline-none"
                     placeholder="+91 98888 12345"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-foreground/80 mb-1">Email Address</label>
+                  <input
+                    required
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full border border-secondary rounded-md px-4 py-2 bg-white text-sm focus:ring-1 focus:ring-rose focus:border-rose outline-none"
+                    placeholder="your@email.com"
                   />
                 </div>
               </div>
