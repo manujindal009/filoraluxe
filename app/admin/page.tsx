@@ -92,7 +92,11 @@ export default function AdminDashboardPage() {
                   <div className="text-right">
                     <span className="font-medium text-sm">
                       {formatPrice(
-                        order.total - (order.discount_amount || 0) + (order.delivery_charge || 0) + (order.gst_amount || 0) + (order.gift_wrap_charge || 0)
+                        Number(order.total || 0) - 
+                        Number(order.discount_amount || 0) + 
+                        Number(order.delivery_charge || 0) + 
+                        Number(order.gst_amount || 0) + 
+                        Number(order.gift_wrap_charge || 0)
                       )}
                     </span>
                     <span className="block text-xs text-sage capitalize mt-0.5">{order.status}</span>

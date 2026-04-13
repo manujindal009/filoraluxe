@@ -68,8 +68,9 @@ export default function AdminOrdersPage() {
               className="w-full pl-9 pr-4 py-2 border border-secondary rounded-md text-sm focus:outline-none focus:border-rose focus:ring-1 focus:ring-rose"
             />
           </div>
-          <div className="text-sm text-foreground/50 whitespace-nowrap self-end sm:self-auto">
+          <div className="text-sm text-foreground/50 whitespace-nowrap self-end sm:self-auto flex items-center gap-2">
             Showing {filteredOrders.length} orders
+            <span className="text-[10px] bg-secondary px-1.5 py-0.5 rounded opacity-50">v2.1</span>
           </div>
         </div>
 
@@ -148,7 +149,13 @@ export default function AdminOrdersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 font-bold text-foreground">
-                      {formatPrice(order.total - (order.discountAmount || 0) + (order.deliveryCharge || 0) + (order.gstAmount || 0) + (order.gift_wrap_charge || 0))}
+                      {formatPrice(
+                        Number(order.total || 0) - 
+                        Number(order.discountAmount || 0) + 
+                        Number(order.deliveryCharge || 0) + 
+                        Number(order.gstAmount || 0) + 
+                        Number(order.gift_wrap_charge || 0)
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
