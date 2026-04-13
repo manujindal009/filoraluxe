@@ -90,7 +90,7 @@ export default function AdminDashboardPage() {
                     <span className="text-xs text-foreground/50">{order.profiles?.email || "Customer"}</span>
                   </div>
                   <div className="text-right">
-                    <span className="font-medium text-sm">{formatPrice(order.total)}</span>
+                    <span className="font-medium text-sm">{formatPrice(order.finalAmount || order.total)}</span>
                     <span className="block text-xs text-sage capitalize mt-0.5">{order.status}</span>
                   </div>
                 </div>

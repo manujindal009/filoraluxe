@@ -40,6 +40,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized: Missing User Identity" }, { status: 400 });
     }
 
+    const calculatedFinalAmount = couponDetails?.finalAmount || (total + (options.deliveryCharge || 0) + (options.gstAmount || 0) + (options.gift_wrap_charge || 0));
+
     // 3. Insert Order into Supabase (Using Admin Client to bypass RLS)
     const { data: orderData, error: orderError } = await supabase
       .from('orders')
@@ -62,7 +64,7 @@ export async function POST(req: Request) {
         state: shippingDetails.state,
         coupon_code: couponDetails?.code || null,
         discount_amount: couponDetails?.discountAmount || 0,
-        final_amount: couponDetails?.finalAmount || total,
+        final_amount: calculatedFinalAmount,
         coupon_owner: couponDetails?.ownerName || null,
         // Store Razorpay detailed info as requested
         razorpay_order_id: razorpay_order_id,
@@ -106,7 +108,7 @@ export async function POST(req: Request) {
           orderId: newOrderId,
           customerName: shippingDetails.name,
           items: items,
-          total: couponDetails?.finalAmount || total,
+          total: calculatedFinalAmount,
           address: `${shippingDetails.street}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.zipCode}`,
           customerEmail: customerEmail,
           paymentMethod: 'razorpay',

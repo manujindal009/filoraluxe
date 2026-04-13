@@ -117,7 +117,7 @@ export async function placeOrder(
     gift_wrap_charge: orderData.gift_wrap_charge ?? 0,
     couponCode: orderData.coupon_code,
     discountAmount: orderData.discount_amount,
-    finalAmount: orderData.final_amount,
+    finalAmount: orderData.final_amount || (orderData.total + (orderData.delivery_charge || 0) + (orderData.gst_amount || 0) + (orderData.gift_wrap_charge || 0)),
     couponOwner: orderData.coupon_owner
   };
 }

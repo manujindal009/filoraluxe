@@ -148,7 +148,7 @@ export default function AdminOrdersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 font-bold text-foreground">
-                      {formatPrice(order.total)}
+                      {formatPrice(order.finalAmount || order.total)}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
