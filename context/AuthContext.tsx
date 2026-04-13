@@ -12,6 +12,8 @@ interface AuthContextType {
   register: (email: string, password: string, name: string, phone: string) => Promise<void>;
   resendVerification: (email: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (name: string, phone: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
   isAdmin: boolean;
 }
 
@@ -161,11 +163,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setUser(null);
   };
+  
+  const updateProfile = async (name: string, phone: string) => {
+    if (!user) throw new Error("Not authenticated");
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update({ name: name.trim(), phone: phone.replace(/\D/g, "") })
+      .eq('id', user.id);
+      
+    if (error) throw error;
+    
+    // Refresh local user state
+    await fetchUserProfile(user.id);
+  };
+  
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+  };
 
   const isAdmin = user?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, loginWithGoogle, register, logout, isAdmin, resendVerification } as any}>
+    <AuthContext.Provider value={{ user, isLoading, login, loginWithGoogle, register, logout, updateProfile, updatePassword, isAdmin, resendVerification } as any}>
       {children}
     </AuthContext.Provider>
   );

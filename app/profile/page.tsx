@@ -9,14 +9,37 @@ import { fetchUserOrders } from "@/lib/api/orders";
 import { Loader } from "@/components/ui/Loader";
 
 import { Order } from "@/types";
+import { useToast } from "@/context/ToastContext";
+import { Lock, Save, X as CloseIcon } from "lucide-react";
 
 // Live Order state
 export default function ProfilePage() {
-  const { user, logout, isLoading: authLoading } = useAuth();
+  const { user, logout, updateProfile, updatePassword, isLoading: authLoading } = useAuth();
   const router = useRouter();
+  const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState<"orders" | "settings">("orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+
+  // Settings form state
+  const [isEditing, setIsEditing] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [settingsForm, setSettingsForm] = useState({
+    name: user?.name || "",
+    phone: user?.phone || "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+
+  useEffect(() => {
+    if (user) {
+      setSettingsForm(prev => ({
+        ...prev,
+        name: user.name,
+        phone: user.phone || ""
+      }));
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -501,24 +524,141 @@ export default function ProfilePage() {
           ) : (
             <div>
               <h1 className="text-3xl font-serif font-semibold mb-8">Account Settings</h1>
-              <div className="bg-white border border-secondary p-6 rounded-xl space-y-6 max-w-2xl">
-                <div>
-                  <label className="block text-xs font-medium uppercase tracking-wider text-foreground/60 mb-2">Name</label>
-                  <p className="font-medium">{user?.name}</p>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium uppercase tracking-wider text-foreground/60 mb-2">Email</label>
-                  <p className="font-medium">{user?.email}</p>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium uppercase tracking-wider text-foreground/60 mb-2">Password</label>
-                  <p className="font-medium text-foreground/50">••••••••</p>
-                </div>
-                <div className="pt-4 border-t border-secondary">
-                  <button className="bg-foreground text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-rose transition-colors">
-                    Edit Details
-                  </button>
-                </div>
+              
+              <div className="bg-white border border-secondary p-8 rounded-2xl shadow-sm max-w-2xl">
+                {!isEditing ? (
+                  <div className="space-y-8">
+                    <div className="grid grid-cols-1 gap-6">
+                      <div>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 font-sans">Full Name</label>
+                        <p className="text-lg font-medium">{user?.name}</p>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 font-sans">Email Address</label>
+                        <p className="text-lg font-medium">{user?.email}</p>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 font-sans">Phone</label>
+                        <p className="text-lg font-medium text-foreground/60">{user?.phone || "Not set"}</p>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 font-sans">Password</label>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-foreground/40 tracking-widest">••••••••</p>
+                          <Lock className="w-3.5 h-3.5 text-foreground/20" />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-8 border-t border-secondary/50">
+                      <button 
+                        onClick={() => setIsEditing(true)}
+                        className="bg-foreground text-white px-8 py-3 rounded-xl text-sm font-semibold hover:bg-rose transition-all shadow-lg hover:shadow-rose/20 active:scale-95"
+                      >
+                        Edit Details
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    setIsUpdating(true);
+                    try {
+                      // 1. Update Profile (Name/Phone)
+                      if (settingsForm.name !== user?.name || settingsForm.phone !== user?.phone) {
+                        await updateProfile(settingsForm.name, settingsForm.phone);
+                        addToast("Profile updated successfully!", "success");
+                      }
+
+                      // 2. Update Password if provided
+                      if (settingsForm.newPassword) {
+                        if (settingsForm.newPassword !== settingsForm.confirmPassword) {
+                          addToast("Passwords do not match", "error");
+                          setIsUpdating(false);
+                          return;
+                        }
+                        if (settingsForm.newPassword.length < 6) {
+                          addToast("Password must be at least 6 characters", "error");
+                          setIsUpdating(false);
+                          return;
+                        }
+                        await updatePassword(settingsForm.newPassword);
+                        addToast("Password updated successfully!", "success");
+                      }
+
+                      setIsEditing(false);
+                      setSettingsForm(prev => ({ ...prev, newPassword: "", confirmPassword: "" }));
+                    } catch (error: any) {
+                      addToast(error.message || "Failed to update profile", "error");
+                    } finally {
+                      setIsUpdating(false);
+                    }
+                  }} className="space-y-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 font-sans">Full Name</label>
+                        <input
+                          required
+                          type="text"
+                          value={settingsForm.name}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
+                          className="w-full border border-secondary rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-rose/20 focus:border-rose outline-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 font-sans">Phone Number</label>
+                        <input
+                          type="tel"
+                          value={settingsForm.phone}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
+                          className="w-full border border-secondary rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-rose/20 focus:border-rose outline-none transition-all"
+                          placeholder="9876543210"
+                        />
+                      </div>
+                      <div className="pt-4 border-t border-secondary/50">
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-rose/60 mb-1.5 font-sans">New Password (Optional)</label>
+                        <input
+                          type="password"
+                          placeholder="Minimum 6 characters"
+                          value={settingsForm.newPassword}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, newPassword: e.target.value })}
+                          className="w-full border border-secondary rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-rose/20 focus:border-rose outline-none transition-all mb-4"
+                        />
+                        <label className="block text-[10px] font-bold uppercase tracking-widest text-rose/60 mb-1.5 font-sans">Confirm New Password</label>
+                        <input
+                          type="password"
+                          placeholder="Repeat new password"
+                          value={settingsForm.confirmPassword}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, confirmPassword: e.target.value })}
+                          className="w-full border border-secondary rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-rose/20 focus:border-rose outline-none transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-8 flex gap-4">
+                      <button
+                        type="submit"
+                        disabled={isUpdating}
+                        className="flex-1 bg-foreground text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-rose transition-all flex items-center justify-center gap-2 disabled:bg-foreground/50 shadow-lg hover:shadow-rose/20"
+                      >
+                        {isUpdating ? <Loader size="sm" /> : <Save className="w-4 h-4" />}
+                        Save Changes
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsEditing(false);
+                          setSettingsForm({ ...settingsForm, newPassword: "", confirmPassword: "" });
+                        }}
+                        disabled={isUpdating}
+                        className="px-6 py-3 rounded-xl text-sm font-semibold border border-secondary text-foreground/60 hover:bg-secondary/20 transition-all flex items-center gap-2"
+                      >
+                        <CloseIcon className="w-4 h-4" />
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           )}
