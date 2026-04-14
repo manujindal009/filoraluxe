@@ -42,7 +42,7 @@ export async function sendOrderConfirmationEmail({
   const paymentStatusText = isCOD ? "Cash on Delivery" : "Paid ✅";
   const paymentStatusColor = isCOD ? "#f59e0b" : "#10b981"; // Amber for COD, Green for Paid
   
-  // Dynamic color for Total Amount as requested: Red for COD, Green for Paid
+  // Color configuration: Red for COD, Green for Paid
   const totalAmountColor = isCOD ? "#E11D48" : "#10b981";
 
   // Safety: Ensure all numeric values are valid numbers to prevent toLocaleString() crashes

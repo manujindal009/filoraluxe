@@ -1,39 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Filora Luxe - Premium Handcrafted Ecommerce
 
-## Getting Started
+Filora Luxe is a high-performance, minimalist ecommerce platform designed for luxury handcrafted products. Built with a modern tech stack (Next.js 14, Supabase, Tailwind CSS), it offers a seamless shopping experience with real-time inventory management, dynamic promotional systems, and secure payment processing.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌟 Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🛍️ Customer Experience
+- **Premium Discovery**: Smooth, high-performance product browsing with category-specific filtering.
+- **Dynamic Cart**: Real-time cart updates with support for gift wrapping and complex discount logic.
+- **Advanced Checkout**: Multi-step checkout flow supporting both **Cash on Delivery (COD)** and **Razorpay** digital payments.
+- **Order Tracking**: Comprehensive profile section for users to view order history and download detailed invoices.
+- **Smart Promotions**: Robust coupon system including percentage discounts and free shipping overrides (`FILORASHIP`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 🛡️ Core Infrastructure
+- **Server-Side Excellence**: Next.js App Router for optimized SEO and sub-second page loads.
+- **Secure Backend**: Supabase PostgreSQL with Row Level Security (RLS) to protect user data.
+- **Automated Communication**: Transactional order confirmation emails powered by **Resend**.
+- **Edge Functions**: Optimized Next.js API routes for secure payment verification.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 📊 Administrative Suite
+- **Management Dashboard**: Real-time sales analytics and inventory tracking.
+- **Inventory Control**: Comprehensive CMS for managing products, categories (Clips, Hairbands, etc.), and stock levels.
+- **Promotion Management**: Dashboard for creating and tracking specialized coupons.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Frontend**: [Next.js 14](https://nextjs.org/) (App Router), [Tailwind CSS](https://tailwindcss.com/)
+- **Backend / Database**: [Supabase](https://supabase.com/) (PostgreSQL)
+- **State Management**: React Context API
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Payments**: [Razorpay SDK](https://razorpay.com/)
+- **Emails**: [Resend](https://resend.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🚀 Getting Started
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Prerequisites
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Node.js 18+ 
+- npm / yarn / pnpm
 
+### Installation
 
-<!-- Build Trigger: Sun Apr 12 19:44:56 IST 2026 -->
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/manujindal009/filoraluxe.git
+   cd filoraluxe
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**
+   Create a `.env.local` file in the root directory and add your credentials:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   
+   NEXT_PUBLIC_RAZORPAY_KEY_ID=your_razorpay_id
+   RAZORPAY_KEY_SECRET=your_razorpay_secret
+   
+   RESEND_API_KEY=your_resend_key
+   ```
+
+4. **Database Configuration**
+   Execute the migration scripts located in `database/supabase/supabase_schema.sql` within your Supabase SQL Editor to set up the tables and RLS policies.
+
+5. **Run Locally**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 📂 Project Structure
+
+- `/app`: Next.js App Router (Pages, API Routes)
+- `/components`: Reusable UI components and feature-specific layouts
+- `/lib`: Supabase clients, utility functions, and API wrappers
+- `/context`: Global state management (Auth, Cart, Toast)
+- `/database/supabase`: PostgreSQL migration and setup scripts
+- `/types`: TypeScript interface definitions
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👤 Author
+
+**Manu Jindal**
+- GitHub: [@manujindal009](https://github.com/manujindal009)

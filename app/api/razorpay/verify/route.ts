@@ -66,7 +66,7 @@ export async function POST(req: Request) {
         discount_amount: couponDetails?.discountAmount || 0,
         final_amount: calculatedFinalAmount,
         coupon_owner: couponDetails?.ownerName || null,
-        // Store Razorpay detailed info as requested
+        // Store payment metadata for reconciliation
         razorpay_order_id: razorpay_order_id,
         razorpay_payment_id: razorpay_payment_id,
         razorpay_signature: razorpay_signature
