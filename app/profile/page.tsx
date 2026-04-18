@@ -9,8 +9,10 @@ import { fetchUserOrders } from "@/lib/api/orders";
 import { Loader } from "@/components/ui/Loader";
 
 import { Order } from "@/types";
+import { Lock, Save, X as CloseIcon, AlertTriangle, Trash2 } from "lucide-react";
+import { cancelOrder } from "@/lib/api/orders";
+import { ORDER_CANCELLATION_THRESHOLD_HOURS } from "@/lib/config";
 import { useToast } from "@/context/ToastContext";
-import { Lock, Save, X as CloseIcon } from "lucide-react";
 
 // Live Order state
 export default function ProfilePage() {
@@ -384,6 +386,40 @@ export default function ProfilePage() {
     `);
     win.document.close();
   };
+  
+  const handleCancelOrder = async (orderId: string, isPrepaid: boolean) => {
+    if (!window.confirm("Are you sure you want to cancel this order? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      await cancelOrder(orderId, isPrepaid);
+      addToast("Order cancelled successfully", "success");
+      // Refresh orders
+      if (user) {
+        const data = await fetchUserOrders(user.id);
+        setOrders(data as any);
+      }
+    } catch (error: any) {
+      addToast(error.message || "Failed to cancel order", "error");
+    }
+  };
+
+  const canCancelOrder = (order: Order) => {
+    if (['shipped', 'delivered', 'cancelled'].includes(order.status)) {
+      return { can: false, reason: `Order is already ${order.status}` };
+    }
+    
+    const orderDate = new Date(order.createdAt);
+    const now = new Date();
+    const diffHours = (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60);
+    
+    if (diffHours > ORDER_CANCELLATION_THRESHOLD_HOURS) {
+      return { can: false, reason: "Cancellation window (24h) has passed" };
+    }
+    
+    return { can: true };
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -458,7 +494,7 @@ export default function ProfilePage() {
                   orders.map((order) => (
                     <div key={order.id} className="bg-white border text-foreground/90 border-secondary rounded-xl overflow-hidden">
                       <div className="bg-primary/20 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-secondary">
-                        <div className="flex gap-8">
+                        <div className="flex gap-4 sm:gap-8">
                           <div>
                             <p className="text-xs uppercase tracking-wider text-foreground/60 font-medium mb-1">Order Placed</p>
                             <p className="text-sm font-medium">{new Date(order.createdAt).toLocaleDateString()}</p>
@@ -468,7 +504,7 @@ export default function ProfilePage() {
                             <p className="text-sm font-medium">{formatPrice(order.finalAmount || order.total)}</p>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="sm:text-right">
                           <p className="text-xs uppercase tracking-wider text-foreground/60 font-medium mb-1">Order Number</p>
                           <p className="text-sm font-medium">{order.id}</p>
                         </div>
@@ -491,14 +527,35 @@ export default function ProfilePage() {
                           </div>
                         )}
 
-                        <div className="mt-8 pt-6 border-t border-secondary">
-                          <button
-                            onClick={() => generateInvoice(order)}
-                            className="text-rose font-medium text-sm hover:underline flex items-center gap-1"
-                          >
-                            View Invoice
-                          </button>
-                        </div>
+                          <div className="mt-8 pt-6 border-t border-secondary flex flex-wrap gap-4 items-center">
+                            <button
+                              onClick={() => generateInvoice(order)}
+                              className="text-rose font-medium text-sm hover:underline flex items-center gap-1"
+                            >
+                              View Invoice
+                            </button>
+                            
+                            {canCancelOrder(order).can ? (
+                              <button
+                                onClick={() => handleCancelOrder(order.id, order.paymentMethod !== 'cod')}
+                                className="text-foreground/40 hover:text-rose font-medium text-sm flex items-center gap-1 ml-auto transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                Cancel Order
+                              </button>
+                            ) : order.status !== 'cancelled' && (
+                              <span className="text-[10px] text-foreground/30 ml-auto flex items-center gap-1">
+                                <AlertTriangle className="w-3 h-3" />
+                                {canCancelOrder(order).reason}
+                              </span>
+                            )}
+                            
+                            {order.status === 'cancelled' && (
+                              <span className="text-xs font-medium text-rose ml-auto bg-rose/5 px-2 py-1 rounded">
+                                This order was cancelled
+                              </span>
+                            )}
+                          </div>
                       </div>
                     </div>
                   ))

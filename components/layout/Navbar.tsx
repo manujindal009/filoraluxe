@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ShoppingBag, Menu, X, User } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
@@ -129,27 +130,44 @@ export function Navbar() {
           </div>
           
           <nav className="flex flex-col space-y-6">
-            {navLinks.map((link, i) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "text-2xl font-serif font-medium transition-all duration-300",
-                  pathname === link.href ? "text-rose translate-x-1" : "text-foreground/80"
-                )}
-                style={{ transitionDelay: `${i * 50}ms` }}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {user?.role === 'admin' && (
-              <Link 
-                href="/admin" 
-                className="text-2xl font-serif font-medium text-rose"
-              >
-                Admin Dashboard
-              </Link>
-            )}
+            <AnimatePresence>
+              {mobileMenuOpen && (
+                <>
+                  {navLinks.map((link, i) => (
+                    <motion.div
+                      key={link.href}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 + i * 0.1, duration: 0.5 }}
+                    >
+                      <Link
+                        href={link.href}
+                        className={cn(
+                          "text-2xl font-serif font-medium transition-all duration-300",
+                          pathname === link.href ? "text-rose translate-x-1" : "text-foreground/80"
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                    </motion.div>
+                  ))}
+                  {user?.role === 'admin' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 + navLinks.length * 0.1, duration: 0.5 }}
+                    >
+                      <Link 
+                        href="/admin" 
+                        className="text-2xl font-serif font-medium text-rose"
+                      >
+                        Admin Dashboard
+                      </Link>
+                    </motion.div>
+                  )}
+                </>
+              )}
+            </AnimatePresence>
             
             <div className="pt-8 flex flex-col items-center space-y-6">
               <Link 

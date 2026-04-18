@@ -209,7 +209,9 @@ export async function fetchUserOrders(userId: string): Promise<Order[]> {
     couponCode: o.coupon_code,
     discountAmount: o.discount_amount,
     finalAmount: o.final_amount,
-    couponOwner: o.coupon_owner
+    couponOwner: o.coupon_owner,
+    cancelledAt: o.cancelled_at,
+    refundStatus: o.refund_status
   }));
 }
 
@@ -250,7 +252,7 @@ export async function fetchAllOrders(): Promise<Order[]> {
   }));
 }
 
-export async function updateOrderStatus(orderId: string, status: 'pending' | 'processing' | 'shipped' | 'delivered'): Promise<Order> {
+export async function updateOrderStatus(orderId: string, status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned'): Promise<Order> {
   const { data, error } = await supabase
     .from('orders')
     .update({ status })
@@ -282,6 +284,24 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'pr
     couponCode: data.coupon_code,
     discountAmount: data.discount_amount,
     finalAmount: data.final_amount,
-    couponOwner: data.coupon_owner
+    couponOwner: data.coupon_owner,
+    cancelledAt: data.cancelled_at,
+    refundStatus: data.refund_status
   };
+}
+
+export async function cancelOrder(orderId: string, isPrepaid: boolean = false): Promise<void> {
+  const { error } = await supabase
+    .from('orders')
+    .update({ 
+      status: 'cancelled',
+      cancelled_at: new Date().toISOString(),
+      refund_status: isPrepaid ? 'pending' : null
+    })
+    .eq('id', orderId);
+  
+  if (error) {
+    console.error("[cancelOrder] Error:", error.message);
+    throw error;
+  }
 }

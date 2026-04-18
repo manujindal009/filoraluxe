@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { fetchCategories } from "@/lib/api/categories";
+import { motion, AnimatePresence } from "framer-motion";
 import { categories as staticCategories } from "@/lib/data/categories";
 import { Category } from "@/types";
 import { Filter, X, ChevronDown, ChevronRight } from "lucide-react";
@@ -112,7 +113,9 @@ export function FilterSidebar({
               
               {(expandedCategories[cat.slug] || selectedCategory === cat.slug) && cat.subcategories && cat.subcategories.length > 0 && (
                 <ul className="pl-4 space-y-2 border-l border-secondary ml-1 py-1">
-                  {cat.subcategories.map((sub) => (
+                  {cat.subcategories
+                    .filter(sub => sub.slug !== 'gift-keychains')
+                    .map((sub) => (
                     <li key={sub.id}>
                       <button
                         onClick={() => {
@@ -162,31 +165,38 @@ export function FilterSidebar({
   );
 
   return (
-    <>
+    <AnimatePresence>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:block w-64 flex-shrink-0 pr-8">
-        <div className="sticky top-24">
+      <aside className="hidden md:block w-72 flex-shrink-0 pr-10 border-r border-secondary/50">
+        <div className="sticky top-28">
           {content}
         </div>
       </aside>
 
-      {/* Mobile Drawer Overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/40 z-[100] md:hidden transition-opacity"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
       {/* Mobile Drawer */}
-      <div 
-        className={cn(
-          "fixed inset-y-0 left-0 w-80 bg-background z-[110] p-6 shadow-xl transform transition-transform duration-300 ease-in-out md:hidden flex flex-col",
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        {content}
-      </div>
-    </>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] md:hidden">
+          {/* Overlay */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+          />
+
+          {/* Panel */}
+          <motion.div 
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="absolute inset-y-0 left-0 w-[300px] bg-white shadow-2xl p-6 overflow-y-auto flex flex-col"
+          >
+            {content}
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }

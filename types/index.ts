@@ -69,8 +69,10 @@ export interface Order {
   gift_wrap_charge?: number;
   couponCode?: string;
   couponOwner?: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered';
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   createdAt: string;
+  cancelledAt?: string;
+  refundStatus?: string;
   shippingAddress: {
     name: string;
     email?: string;

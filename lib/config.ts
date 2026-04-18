@@ -1,0 +1,10 @@
+export const ALLOWED_COD_CITIES = [
+  "CHANDIGARH",
+  "MOHALI",
+  "PANCHKULA",
+  "ZIRAKPUR",
+  "KHARAR",
+  "RUPNAGAR"
+];
+
+export const ORDER_CANCELLATION_THRESHOLD_HOURS = 24;

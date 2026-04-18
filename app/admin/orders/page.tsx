@@ -31,7 +31,7 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const handleStatusChange = async (orderId: string, newStatus: 'pending' | 'processing' | 'shipped' | 'delivered') => {
+  const handleStatusChange = async (orderId: string, newStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled') => {
     setStatusLoading(orderId);
     try {
       const updatedOrder = await updateOrderStatus(orderId, newStatus);
@@ -167,6 +167,7 @@ export default function AdminOrdersPage() {
                             order.status === 'delivered' ? 'bg-sage/10 text-sage border-sage/30' :
                             order.status === 'shipped' ? 'bg-blue-100 text-blue-700 border-blue-300' :
                             order.status === 'processing' ? 'bg-amber-100 text-amber-700 border-amber-300' :
+                            order.status === 'cancelled' ? 'bg-rose/10 text-rose border-rose/30' :
                             'bg-primary/20 text-foreground/70 border-secondary'
                           }`}
                         >
@@ -174,6 +175,7 @@ export default function AdminOrdersPage() {
                           <option value="processing">Processing</option>
                           <option value="shipped">Shipped</option>
                           <option value="delivered">Delivered</option>
+                          <option value="cancelled">Cancelled</option>
                         </select>
                         {statusLoading === order.id && <Loader2 className="w-4 h-4 animate-spin text-foreground/50" />}
                       </div>

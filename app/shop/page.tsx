@@ -141,7 +141,7 @@ function ShopContent() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row gap-10">
         <FilterSidebar 
           selectedCategory={selectedCategory}
           onSelectCategory={(cat) => updateFilters({ category: cat, subcategory: null })}

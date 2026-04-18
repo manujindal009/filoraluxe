@@ -86,5 +86,44 @@ export const categories: Category[] = [
     slug: "diy-supplies",
     description: "Everything you need to start your crochet journey.",
     image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/diy.jpeg"
+  },
+  {
+    id: "c1000000-0000-0000-0000-000000000011",
+    name: "Spiritual",
+    slug: "spiritual",
+    description: "Handcrafted items for spiritual wellness and decor.",
+    image: "file:///Users/manujindal/.gemini/antigravity/brain/6e34b3be-3a8c-47d4-8c9d-0d034161a3fd/spiritual_category_image_1776514780816.png",
+    subcategories: [
+      {
+        id: "c1000000-0000-0000-0000-000000001101",
+        categoryId: "c1000000-0000-0000-0000-000000000011",
+        name: "Laddu Gopal Dresses",
+        slug: "laddu-gopal-dresses",
+        description: "Handmade crochet dresses for Laddu Gopal."
+      }
+    ]
+  },
+  {
+    id: "c1000000-0000-0000-0000-000000000012",
+    name: "Wearables",
+    slug: "wearables",
+    description: "Stay cozy and stylish with our crochet wearables.",
+    image: "file:///Users/manujindal/.gemini/antigravity/brain/6e34b3be-3a8c-47d4-8c9d-0d034161a3fd/wearables_category_image_1776514809511.png",
+    subcategories: [
+      {
+        id: "c1000000-0000-0000-0000-000000001201",
+        categoryId: "c1000000-0000-0000-0000-000000000012",
+        name: "Socks",
+        slug: "socks",
+        description: "Warm and comfortable crochet socks."
+      },
+      {
+        id: "c1000000-0000-0000-0000-000000001202",
+        categoryId: "c1000000-0000-0000-0000-000000000012",
+        name: "Mufflers",
+        slug: "mufflers",
+        description: "Elegant and cozy crochet mufflers."
+      }
+    ]
   }
 ];

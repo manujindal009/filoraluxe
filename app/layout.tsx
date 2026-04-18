@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { ToastContainer } from "@/components/ui/Toast";
+import { SplashScreen } from "@/components/layout/SplashScreen";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,6 +32,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="antialiased min-h-screen flex flex-col relative text-balance">
         <Providers>
+          <SplashScreen />
           <Navbar />
           <main className="flex-1 flex flex-col pt-20">
             {children}

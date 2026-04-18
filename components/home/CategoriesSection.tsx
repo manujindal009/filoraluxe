@@ -15,12 +15,12 @@ export function CategoriesSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-          {categories.slice(0, 10).map((category) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+          {categories.map((category) => (
             <Link 
               key={category.id} 
               href={`/shop?category=${category.slug}`}
-              className="group relative h-[220px] md:h-[350px] rounded-xl overflow-hidden block"
+              className="group relative h-[180px] md:h-[350px] rounded-xl overflow-hidden block"
             >
               <img 
                 src={category.image} 
