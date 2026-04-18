@@ -92,7 +92,7 @@ export const categories: Category[] = [
     name: "Spiritual",
     slug: "spiritual",
     description: "Handcrafted items for spiritual wellness and decor.",
-    image: "file:///Users/manujindal/.gemini/antigravity/brain/6e34b3be-3a8c-47d4-8c9d-0d034161a3fd/spiritual_category_image_1776514780816.png",
+    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/spiritual;.png",
     subcategories: [
       {
         id: "c1000000-0000-0000-0000-000000001101",

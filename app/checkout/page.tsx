@@ -501,7 +501,7 @@ export default function CheckoutPage() {
                           value={formData.firstName}
                           onChange={handleInputChange}
                           className="w-full border border-foreground/20 rounded-xl pl-11 pr-4 py-3 bg-white text-sm focus:ring-2 focus:ring-rose/20 focus:border-rose outline-none transition-all"
-                          placeholder="Manu"
+                          placeholder="John"
                         />
                       </div>
                     </div>
@@ -516,7 +516,7 @@ export default function CheckoutPage() {
                           value={formData.lastName}
                           onChange={handleInputChange}
                           className="w-full border border-foreground/20 rounded-xl pl-11 pr-4 py-3 bg-white text-sm focus:ring-2 focus:ring-rose/20 focus:border-rose outline-none transition-all"
-                          placeholder="Jindal"
+                          placeholder="Doe"
                         />
                       </div>
                     </div>

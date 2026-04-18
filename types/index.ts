@@ -98,7 +98,7 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
-  image: string;
+  image?: string;
   description: string;
   displayOrder?: number;
   subcategories?: Subcategory[];

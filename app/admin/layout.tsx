@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Tag, MessageSquare, Star } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Tag, MessageSquare, Star, Gift, Layers } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +32,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { icon: Package, label: "Products", href: "/admin/products" },
     { icon: ShoppingBag, label: "Orders", href: "/admin/orders" },
     { icon: Star, label: "Custom Orders", href: "/admin/custom-orders" },
-    { icon: Tag, label: "Coupons", href: "/admin/coupons" },
+    { icon: Gift, label: "Coupons", href: "/admin/coupons" },
+    { icon: Layers, label: "Categories", href: "/admin/categories" },
     { icon: MessageSquare, label: "Reviews", href: "/admin/reviews" },
     { icon: Users, label: "Customers", href: "/admin/customers" },
     { icon: Settings, label: "Settings", href: "/admin/settings" },
