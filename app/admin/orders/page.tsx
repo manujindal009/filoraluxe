@@ -81,6 +81,7 @@ export default function AdminOrdersPage() {
               <tr>
                 <th className="px-6 py-4">Order ID</th>
                 <th className="px-6 py-4">Customer</th>
+                <th className="px-6 py-4">Products</th>
                 <th className="px-6 py-4">Payment</th>
                 <th className="px-6 py-4">Charges</th>
                 <th className="px-6 py-4">Total</th>
@@ -110,6 +111,43 @@ export default function AdminOrdersPage() {
                       <div className="flex flex-col">
                         <span className="font-medium">{order.shippingAddress.name}</span>
                         <span className="text-xs text-foreground/40">{new Date(order.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-2">
+                        {order.items && order.items.length > 0 ? (
+                          <>
+                            {order.items.slice(0, 2).map((item, idx) => (
+                              <div key={idx} className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded bg-secondary/50 overflow-hidden flex-shrink-0 border border-secondary">
+                                  {item.product?.images?.[0] ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img 
+                                      src={item.product.images[0]} 
+                                      alt={item.product.name} 
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <ImageIcon className="w-4 h-4 m-auto text-foreground/20" />
+                                  )}
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                  <span className="text-xs font-medium truncate max-w-[120px]" title={item.product?.name}>
+                                    {item.product?.name || 'Unknown Product'}
+                                  </span>
+                                  <span className="text-[10px] text-foreground/40 leading-none">Qty: {item.quantity}</span>
+                                </div>
+                              </div>
+                            ))}
+                            {order.items.length > 2 && (
+                                <span className="text-[10px] text-rose font-medium pl-10">
+                                  + {order.items.length - 2} more items
+                                </span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-xs text-foreground/30 italic">No items found</span>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">

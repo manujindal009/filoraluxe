@@ -218,7 +218,15 @@ export async function fetchUserOrders(userId: string): Promise<Order[]> {
 export async function fetchAllOrders(): Promise<Order[]> {
   const { data, error } = await supabase
     .from('orders')
-    .select('*')
+    .select(`
+      *,
+      order_items (
+        quantity,
+        price_at_time,
+        product_id,
+        products ( name, images )
+      )
+    `)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -229,7 +237,11 @@ export async function fetchAllOrders(): Promise<Order[]> {
   return data.map(o => ({
     id: o.id,
     userId: o.user_id,
-    items: [], 
+    items: (o.order_items || []).map((oi: any) => ({
+      quantity: oi.quantity,
+      price_at_time: oi.price_at_time,
+      product: oi.products 
+    })), 
     total: o.total,
     status: o.status,
     createdAt: o.created_at,
@@ -257,7 +269,15 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'pr
     .from('orders')
     .update({ status })
     .eq('id', orderId)
-    .select()
+    .select(`
+      *,
+      order_items (
+        quantity,
+        price_at_time,
+        product_id,
+        products ( name, images )
+      )
+    `)
     .single();
 
   if (error) throw error;
@@ -265,7 +285,11 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'pr
   return {
     id: data.id,
     userId: data.user_id,
-    items: [],
+    items: (data.order_items || []).map((oi: any) => ({
+      quantity: oi.quantity,
+      price_at_time: oi.price_at_time,
+      product: oi.products 
+    })),
     total: data.total,
     status: data.status,
     createdAt: data.created_at,
