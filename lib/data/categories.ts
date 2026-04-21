@@ -71,7 +71,7 @@ export const categories: Category[] = [
     name: "Seasonal Collection",
     slug: "seasonal-collection",
     description: "Limited edition festive and seasonal drops.",
-    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/seasonal%20collection.jpeg"
+    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/seasonal.png"
   },
   {
     id: "c1000000-0000-0000-0000-000000000009",
@@ -108,7 +108,7 @@ export const categories: Category[] = [
     name: "Wearables",
     slug: "wearables",
     description: "Stay cozy and stylish with our crochet wearables.",
-    image: "file:///Users/manujindal/.gemini/antigravity/brain/6e34b3be-3a8c-47d4-8c9d-0d034161a3fd/wearables_category_image_1776514809511.png",
+    image: "https://mpewokuvkijukarwcgci.supabase.co/storage/v1/object/public/products/homepage/categories/seasonal%20collection.jpeg",
     subcategories: [
       {
         id: "c1000000-0000-0000-0000-000000001201",

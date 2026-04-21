@@ -30,19 +30,22 @@ export async function fetchAdminStats(): Promise<DashboardStats> {
 
     if (ordersError) throw ordersError;
 
-    // Filter orders by time periods
-    const currentPeriodOrders = allOrders?.filter(o => new Date(o.created_at) >= thirtyDaysAgo) || [];
-    const previousPeriodOrders = allOrders?.filter(o => {
+    // Filter orders by time periods (Excluding Cancelled)
+    const activeOrders = allOrders?.filter(o => o.status !== 'cancelled') || [];
+    const currentPeriodActive = activeOrders.filter(o => new Date(o.created_at) >= thirtyDaysAgo);
+    const previousPeriodActive = activeOrders.filter(o => {
       const d = new Date(o.created_at);
       return d >= sixtyDaysAgo && d < thirtyDaysAgo;
-    }) || [];
+    });
 
-    const totalRevenue = allOrders?.reduce((acc, order) => acc + (order.final_amount || 0), 0) || 0;
-    const currentRevenue = currentPeriodOrders.reduce((acc, o) => acc + (o.final_amount || 0), 0);
-    const previousRevenue = previousPeriodOrders.reduce((acc, o) => acc + (o.final_amount || 0), 0);
+    const totalRevenue = activeOrders.reduce((acc, order) => acc + (order.final_amount || 0), 0);
+    const currentRevenue = currentPeriodActive.reduce((acc, o) => acc + (o.final_amount || 0), 0);
+    const previousRevenue = previousPeriodActive.reduce((acc, o) => acc + (o.final_amount || 0), 0);
 
     const revenueTrend = calculateTrend(currentRevenue, previousRevenue);
-    const ordersTrend = calculateTrend(currentPeriodOrders.length, previousPeriodOrders.length);
+    
+    // For order counts, we also exclude cancelled
+    const ordersTrend = calculateTrend(currentPeriodActive.length, previousPeriodActive.length);
 
     // 2. Fetch Customers Count & Trends
     const { data: allProfiles, error: profilesError } = await supabase
@@ -64,13 +67,13 @@ export async function fetchAdminStats(): Promise<DashboardStats> {
     const customersTrend = calculateTrend(currentCustomersCount, previousCustomersCount);
 
     // 3. Conversion Rate Calculation (Real MoM)
-    // Conversion = (Orders / Customers) * 5.2 (Simulated visitor multiplier)
+    // Conversion = (Successful Orders / Customers) * 5.2 (Simulated visitor multiplier)
     const currentConversionRate = currentCustomersCount > 0 
-      ? (currentPeriodOrders.length / currentCustomersCount) * 5.2 
+      ? (currentPeriodActive.length / currentCustomersCount) * 5.2 
       : 0;
     
     const previousConversionRate = previousCustomersCount > 0 
-      ? (previousPeriodOrders.length / previousCustomersCount) * 5.2 
+      ? (previousPeriodActive.length / previousCustomersCount) * 5.2 
       : 0;
 
     const conversionRate = Math.min(Math.round(currentConversionRate * 10) / 10, 100);
@@ -97,10 +100,11 @@ export async function fetchAdminStats(): Promise<DashboardStats> {
     if (recentError) throw recentError;
 
     // ... (logic for top product remains the same)
-    // 5. Fetch Top Selling Product
+    // 5. Fetch Top Selling Product (Excluding Cancelled Orders)
     const { data: itemsData, error: itemsError } = await supabase
       .from("order_items")
-      .select("product_id, quantity");
+      .select("product_id, quantity, orders!inner(status)")
+      .neq("orders.status", "cancelled");
 
     if (itemsError) throw itemsError;
 
@@ -134,7 +138,7 @@ export async function fetchAdminStats(): Promise<DashboardStats> {
     return {
       totalRevenue,
       revenueTrend,
-      totalOrders: allOrders.length,
+      totalOrders: activeOrders.length,
       ordersTrend,
       totalCustomers: customers.length,
       customersTrend,
@@ -187,7 +191,7 @@ export async function fetchAdminCustomers(): Promise<CustomerStats[]> {
     // 2. Fetch all orders to aggregate stats
     const { data: orders, error: ordersError } = await supabase
       .from("orders")
-      .select("user_id, final_amount, shipping_address, created_at")
+      .select("user_id, status, final_amount, shipping_address, created_at")
       .order("created_at", { ascending: false });
 
     if (ordersError) throw ordersError;
@@ -206,8 +210,8 @@ export async function fetchAdminCustomers(): Promise<CustomerStats[]> {
         email: profile.email,
         phone: profile.phone || address?.phone || "N/A",
         location: address ? `${address.city}, ${address.country}` : "No address",
-        totalSpent: userOrders.reduce((acc, o) => acc + (o.final_amount || 0), 0),
-        ordersCount: userOrders.length,
+        totalSpent: userOrders.filter(o => o.status !== 'cancelled').reduce((acc, o) => acc + (o.final_amount || 0), 0),
+        ordersCount: userOrders.filter(o => o.status !== 'cancelled').length,
         joinedDate: profile.created_at
       };
     });

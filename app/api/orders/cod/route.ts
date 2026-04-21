@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin as supabase } from "@/lib/supabaseAdmin";
-import { sendOrderConfirmationEmail } from "@/lib/utils/email";
+import { sendOrderConfirmationEmail, sendAdminNewOrderNotification } from "@/lib/utils/email";
 
 export async function POST(req: Request) {
   try {
@@ -114,6 +114,17 @@ export async function POST(req: Request) {
     } catch (emailError) {
       console.error(`[CODOrder] Unexpected exception during email sending for order ${newOrderId}:`, emailError);
     }
+
+    // 5. Notify Admin (Async background)
+    sendAdminNewOrderNotification({
+      id: newOrderId,
+      items: items,
+      total: total,
+      finalAmount: calculatedFinalAmount,
+      shippingAddress: shippingDetails,
+      paymentMethod: 'cod',
+      createdAt: new Date().toISOString()
+    }).catch(console.error);
 
     return NextResponse.json({
       success: true,

@@ -264,3 +264,159 @@ export async function sendPasswordResetEmail(email: string, name: string, resetL
     return { success: false, error: err };
   }
 }
+
+export async function sendAdminNewOrderNotification(order: any) {
+  const adminEmail = 'filoraluxe@yahoo.com';
+  
+  try {
+    const { data, error } = await getResend().emails.send({
+      from: 'Filora Luxe <orders@filoraluxe.in>',
+      to: [adminEmail],
+      subject: `🚨 New Order Received: #${order.id}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; }
+            .header { background: #E11D48; color: white; padding: 15px; text-align: center; border-radius: 4px 4px 0 0; }
+            .content { padding: 20px; border: 1px solid #eee; border-top: none; }
+            .field { margin-bottom: 15px; }
+            .label { font-weight: bold; color: #666; font-size: 12px; text-transform: uppercase; }
+            .value { font-size: 16px; font-weight: 500; }
+            .items { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            .items th { text-align: left; border-bottom: 2px solid #333; padding: 10px 0; font-size: 12px; }
+            .items td { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+            .total-row { font-weight: bold; font-size: 18px; color: #E11D48; }
+            .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #999; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h2 style="margin:0;">New Order Alert!</h2>
+            </div>
+            <div class="content">
+              <div class="field">
+                <div class="label">Order ID</div>
+                <div class="value">#${order.id}</div>
+              </div>
+              <div class="field">
+                <div class="label">Customer</div>
+                <div class="value">${order.shippingAddress.name} (${order.shippingAddress.email || 'No Email'})</div>
+              </div>
+              <div class="field">
+                <div class="label">Phone</div>
+                <div class="value">${order.shippingAddress.phone || 'N/A'}</div>
+              </div>
+              <div class="field">
+                <div class="label">Payment Method</div>
+                <div class="value" style="text-transform: uppercase;">${order.paymentMethod}</div>
+              </div>
+              
+              <table class="items">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${order.items.map((item: any) => `
+                    <tr>
+                      <td>${item.product.name}</td>
+                      <td>${item.quantity}</td>
+                      <td>₹${(item.price_at_time * item.quantity).toLocaleString()}</td>
+                    </tr>
+                  `).join('')}
+                  <tr>
+                    <td colspan="2" align="right" style="padding-top: 15px;">Total Amount:</td>
+                    <td align="right" class="total-row" style="padding-top: 15px;">₹${(order.finalAmount || order.total).toLocaleString()}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style="margin-top: 30px; text-align: center;">
+                <a href="https://filoraluxe.in/admin/orders" style="background: #1a1a1a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">View Order in Dashboard</a>
+              </div>
+            </div>
+            <div class="footer">
+              © 2026 Filora Luxe Admin Notifications
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    });
+    
+    if (error) console.error("Admin Notification Error:", error);
+    return { success: !error, data };
+  } catch (err) {
+    console.error("Admin Notification Catch:", err);
+    return { success: false, error: err };
+  }
+}
+
+export async function sendAdminCancellationNotification(orderId: string, customerName: string, reason?: string) {
+  const adminEmail = 'filoraluxe@yahoo.com';
+  
+  try {
+    const { data, error } = await getResend().emails.send({
+      from: 'Filora Luxe <orders@filoraluxe.in>',
+      to: [adminEmail],
+      subject: `⚠️ Order Cancelled: #${orderId}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; }
+            .header { background: #333; color: white; padding: 15px; text-align: center; border-radius: 4px 4px 0 0; }
+            .content { padding: 20px; border: 1px solid #eee; border-top: none; }
+            .field { margin-bottom: 15px; }
+            .label { font-weight: bold; color: #666; font-size: 12px; text-transform: uppercase; }
+            .value { font-size: 16px; font-weight: 500; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h2 style="margin:0;">Order Cancellation Alert</h2>
+            </div>
+            <div class="content">
+              <p>The following order has been cancelled:</p>
+              <div class="field">
+                <div class="label">Order ID</div>
+                <div class="value">#${orderId}</div>
+              </div>
+              <div class="field">
+                <div class="label">Customer Name</div>
+                <div class="value">${customerName}</div>
+              </div>
+              ${reason ? `
+              <div class="field">
+                <div class="label">Reason</div>
+                <div class="value">${reason}</div>
+              </div>
+              ` : ''}
+              
+              <div style="margin-top: 30px; text-align: center;">
+                <a href="https://filoraluxe.in/admin/orders" style="background: #1a1a1a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Check Admin Panel</a>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    });
+    
+    if (error) console.error("Admin Cancellation Notify Error:", error);
+    return { success: !error, data };
+  } catch (err) {
+    console.error("Admin Cancellation Notify Catch:", err);
+    return { success: false, error: err };
+  }
+}

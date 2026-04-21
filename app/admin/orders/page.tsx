@@ -91,13 +91,13 @@ export default function AdminOrdersPage() {
             <tbody className="divide-y divide-secondary">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-foreground/50">
+                  <td colSpan={7} className="px-6 py-12 text-center text-foreground/50">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                   </td>
                 </tr>
               ) : filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-foreground/50">
+                  <td colSpan={7} className="px-6 py-12 text-center text-foreground/50">
                     No orders found matching your search.
                   </td>
                 </tr>
@@ -124,7 +124,7 @@ export default function AdminOrdersPage() {
                                     // eslint-disable-next-line @next/next/no-img-element
                                     <img 
                                       src={item.product.images[0]} 
-                                      alt={item.product.name} 
+                                      alt={item.product?.name || 'Product'} 
                                       className="w-full h-full object-cover"
                                     />
                                   ) : (

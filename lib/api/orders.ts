@@ -1,5 +1,6 @@
 import { Order, OrderItem, CartItem } from "@/types";
 import { supabase } from "@/lib/supabaseClient";
+import { sendAdminNewOrderNotification, sendAdminCancellationNotification } from "@/lib/utils/email";
 
 export async function placeOrder(
   userId: string, 
@@ -92,7 +93,7 @@ export async function placeOrder(
     console.error("Order items failed to write:", itemsError);
   }
 
-  return {
+  const orderToReturn = {
     id: orderData.id,
     userId: orderData.user_id,
     items: items.map(item => ({
@@ -101,6 +102,8 @@ export async function placeOrder(
       price_at_time: item.product.price
     })),
     total: orderData.total,
+    finalAmount: orderData.final_amount || (orderData.total + (options.deliveryCharge || 0) + (options.gstAmount || 0) + (options.gift_wrap_charge || 0)),
+    couponOwner: orderData.coupon_owner,
     status: orderData.status,
     createdAt: orderData.created_at,
     shippingAddress: orderData.shipping_address,
@@ -117,9 +120,19 @@ export async function placeOrder(
     gift_wrap_charge: orderData.gift_wrap_charge ?? 0,
     couponCode: orderData.coupon_code,
     discountAmount: orderData.discount_amount,
-    finalAmount: orderData.final_amount || (orderData.total + (orderData.delivery_charge || 0) + (orderData.gst_amount || 0) + (orderData.gift_wrap_charge || 0)),
-    couponOwner: orderData.coupon_owner
   };
+
+  // 3. Notify Admin (Async background)
+  sendAdminNewOrderNotification({
+    ...orderToReturn,
+    items: items.map(item => ({
+      product: item.product,
+      quantity: item.quantity,
+      price_at_time: item.product.price
+    }))
+  }).catch(console.error);
+
+  return orderToReturn;
 }
 
 export async function fetchUserOrders(userId: string): Promise<Order[]> {
@@ -282,7 +295,7 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'pr
 
   if (error) throw error;
 
-  return {
+  const orderToReturn = {
     id: data.id,
     userId: data.user_id,
     items: (data.order_items || []).map((oi: any) => ({
@@ -312,6 +325,13 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'pr
     cancelledAt: data.cancelled_at,
     refundStatus: data.refund_status
   };
+
+  // If status is changed to cancelled, notify admin
+  if (status === 'cancelled') {
+    sendAdminCancellationNotification(orderId, data.shipping_address.name, "Admin Update").catch(console.error);
+  }
+
+  return orderToReturn;
 }
 
 export async function cancelOrder(orderId: string, isPrepaid: boolean = false): Promise<void> {
@@ -327,5 +347,19 @@ export async function cancelOrder(orderId: string, isPrepaid: boolean = false): 
   if (error) {
     console.error("[cancelOrder] Error:", error.message);
     throw error;
+  }
+
+  // Notify admin (try to get name first)
+  try {
+    const { data: orderData } = await supabase
+      .from('orders')
+      .select('shipping_address')
+      .eq('id', orderId)
+      .single();
+    if (orderData) {
+      sendAdminCancellationNotification(orderId, orderData.shipping_address.name).catch(console.error);
+    }
+  } catch (notifyErr) {
+    console.error("Cancellation notification error:", notifyErr);
   }
 }

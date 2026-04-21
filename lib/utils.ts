@@ -9,6 +9,7 @@ export function formatPrice(price: number) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 1, // Show at least one decimal for things like .9
+    maximumFractionDigits: 2,
   }).format(price);
 }
