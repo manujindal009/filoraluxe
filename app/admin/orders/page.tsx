@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, Loader2, Image as ImageIcon, FileText, Download, Eye, Plus } from "lucide-react";

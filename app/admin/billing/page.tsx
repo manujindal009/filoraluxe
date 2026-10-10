@@ -48,7 +48,7 @@ export default function AdminBillingDashboardPage() {
       setInvoices(data);
     } catch (err) {
       addToast("Failed to load invoices", "error");
-    } fontally: {
+    } finally {
       setLoading(false);
     }
   };
