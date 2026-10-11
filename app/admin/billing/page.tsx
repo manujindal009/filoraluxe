@@ -512,7 +512,16 @@ export default function AdminBillingDashboardPage() {
                           <Edit className="w-3.5 h-3.5" />
                         </Link>
                         <button
-                          onClick={() => downloadInvoicePdf("invoice-template-printable", `${inv.invoiceNumber}.pdf`)}
+                          onClick={() => {
+  setViewInvoice(inv);
+
+  setTimeout(() => {
+    downloadInvoicePdf(
+      "invoice-template-printable",
+      `${inv.invoiceNumber}.pdf`
+    );
+  }, 500);
+}}
                           className="p-1.5 text-foreground/70 hover:text-foreground hover:bg-secondary/50 rounded"
                           title="Download PDF"
                         >
