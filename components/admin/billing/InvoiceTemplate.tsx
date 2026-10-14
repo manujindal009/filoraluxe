@@ -235,7 +235,7 @@ export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({ invoice, isPdf
                 <th className="py-3 px-4">ITEM / DESCRIPTION</th>
                 <th className="py-3 px-3 text-center w-16">QTY</th>
                 <th className="py-3 px-3 text-right w-24">UNIT PRICE</th>
-                {vis.showDiscount && <th className="py-3 px-3 text-right w-24">DISCOUNT</th>}
+                {vis.showDiscount && <th className="py-3 px-3 text-right w-28">DISC / UNIT</th>}
                 <th className="py-3 px-4 text-right w-28">AMOUNT</th>
               </tr>
             </thead>
@@ -358,20 +358,34 @@ export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({ invoice, isPdf
 
           {/* Right Column: Calculations Summary */}
           <div className="bg-[#FAF9F7] p-5 rounded-lg border border-[#F3F4ED] flex flex-col justify-between space-y-3">
-            <div className="space-y-2.5 text-xs">
-              <div className="flex justify-between text-foreground/70">
-                <span>Subtotal</span>
-                <span className="font-mono font-medium text-foreground">
-                  {formatPrice(invoice.subtotal || 0)}
-                </span>
-              </div>
+            {(() => {
+              const grossSubtotal = (items || []).reduce(
+                (acc, it) => acc + (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0),
+                0
+              );
+              const itemsDiscount = (items || []).reduce(
+                (acc, it) => acc + (Number(it.quantity) || 0) * (Number(it.discount) || 0),
+                0
+              );
+              const overallDiscount = Number(invoice.discount) || 0;
+              const totalDiscount = itemsDiscount + overallDiscount;
+              const displaySubtotal = grossSubtotal > 0 ? grossSubtotal : (invoice.subtotal || 0);
 
-              {vis.showDiscount && (invoice.discount || 0) > 0 && (
-                <div className="flex justify-between text-emerald-600 font-medium">
-                  <span>Discount</span>
-                  <span className="font-mono">-{formatPrice(invoice.discount || 0)}</span>
-                </div>
-              )}
+              return (
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex justify-between text-foreground/70">
+                    <span>Subtotal</span>
+                    <span className="font-mono font-medium text-foreground">
+                      {formatPrice(displaySubtotal)}
+                    </span>
+                  </div>
+
+                  {vis.showDiscount && totalDiscount > 0 && (
+                    <div className="flex justify-between text-emerald-600 font-medium">
+                      <span>Discount</span>
+                      <span className="font-mono">-{formatPrice(totalDiscount)}</span>
+                    </div>
+                  )}
 
               {vis.showShipping && (
                 <div className="flex justify-between text-foreground/70">
@@ -382,15 +396,17 @@ export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({ invoice, isPdf
                 </div>
               )}
 
-              {invoice.taxEnabled && (
-                <div className="flex justify-between text-foreground/70">
-                  <span>GST / Tax ({invoice.taxRate || 0}%)</span>
-                  <span className="font-mono font-medium text-foreground">
-                    {formatPrice(invoice.tax || 0)}
-                  </span>
+                  {invoice.taxEnabled && (
+                    <div className="flex justify-between text-foreground/70">
+                      <span>GST / Tax ({invoice.taxRate || 0}%)</span>
+                      <span className="font-mono font-medium text-foreground">
+                        {formatPrice(invoice.tax || 0)}
+                      </span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              );
+            })()}
 
             <div
               className="border-t-2 pt-3 flex justify-between items-center"

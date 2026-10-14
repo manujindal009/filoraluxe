@@ -53,7 +53,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 3. Create Main Invoices Table
 CREATE TABLE IF NOT EXISTS invoices (
-  id uuid PRIMARY KEY DEFAULT extensions.uuid_generate_v4(),
+  id text PRIMARY KEY,
   invoice_number text UNIQUE NOT NULL,
   order_id text,
   order_number text,

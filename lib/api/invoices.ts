@@ -301,7 +301,8 @@ export async function saveInvoice(invoiceData: Partial<Invoice>): Promise<Invoic
     const payload = mapInvoiceToRow(finalInvoice);
     const { error } = await supabase.from("invoices").upsert(payload);
     if (error) {
-      console.warn("[saveInvoice] DB upsert warning:", error.message);
+      console.error("[saveInvoice] DB upsert failed:", error.message);
+      throw new Error(error.message);
     }
   } catch (err) {
     console.warn("[saveInvoice] DB call failed, preserved in local storage:", err);

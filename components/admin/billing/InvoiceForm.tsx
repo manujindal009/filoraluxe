@@ -68,8 +68,19 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
     taxEnabled: boolean = invoice.taxEnabled || false,
     taxRate: number = invoice.taxRate || 0
   ) => {
-    const subtotal = items.reduce((acc, item) => acc + (Number(item.amount) || 0), 0);
-    const afterDiscount = Math.max(0, subtotal - discount);
+    // Gross subtotal (Quantity * Unit Price before item discount)
+    const grossSubtotal = items.reduce(
+      (acc, item) => acc + (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0),
+      0
+    );
+    // Total discount on items (Quantity * Per-Unit Discount)
+    const itemsDiscount = items.reduce(
+      (acc, item) => acc + (Number(item.quantity) || 0) * (Number(item.discount) || 0),
+      0
+    );
+    // Net subtotal after item-level discount
+    const netItemsAmount = items.reduce((acc, item) => acc + (Number(item.amount) || 0), 0);
+    const afterDiscount = Math.max(0, netItemsAmount - discount);
     const tax = taxEnabled ? (afterDiscount * taxRate) / 100 : 0;
     const total = Math.max(0, afterDiscount + shipping + tax);
 
@@ -83,7 +94,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
     onChange({
       ...invoice,
       items,
-      subtotal,
+      subtotal: grossSubtotal,
       discount,
       shipping,
       taxEnabled,
@@ -208,12 +219,13 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
       const updated = { ...item, [field]: value };
 
-      // Auto calculation for amount
+      // Auto calculation for amount: (Unit Price - Per-Unit Discount) * Quantity
       if (field === "quantity" || field === "unitPrice" || field === "discount") {
         const qty = Number(field === "quantity" ? value : updated.quantity) || 0;
         const price = Number(field === "unitPrice" ? value : updated.unitPrice) || 0;
         const disc = Number(field === "discount" ? value : updated.discount) || 0;
-        updated.amount = Math.max(0, qty * price - disc);
+        const effectiveUnitPrice = Math.max(0, price - disc);
+        updated.amount = Math.max(0, qty * effectiveUnitPrice);
       }
 
       return updated;
@@ -684,7 +696,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 {/* Item Discount */}
                 <div className="sm:col-span-2">
                   <label className="block text-[11px] font-medium text-foreground/70 mb-1">
-                    Discount (₹)
+                    Discount / Unit (₹)
                   </label>
                   <input
                     type="number"
@@ -787,26 +799,41 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
           </div>
 
           <div className="bg-secondary/20 p-4 rounded-xl border border-secondary/60 flex flex-col justify-between space-y-2 text-xs">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-foreground/70">Subtotal:</span>
-                <span className="font-mono font-medium">{formatPrice(invoice.subtotal || 0)}</span>
-              </div>
-              <div className="flex justify-between text-emerald-600">
-                <span>Discount:</span>
-                <span className="font-mono">-{formatPrice(invoice.discount || 0)}</span>
-              </div>
-              <div className="flex justify-between text-foreground/70">
-                <span>Shipping:</span>
-                <span className="font-mono">{formatPrice(invoice.shipping || 0)}</span>
-              </div>
-              {invoice.taxEnabled && (
-                <div className="flex justify-between text-foreground/70">
-                  <span>Tax ({invoice.taxRate || 0}%):</span>
-                  <span className="font-mono">{formatPrice(invoice.tax || 0)}</span>
+            {(() => {
+              const itemsDiscount = (invoice.items || []).reduce(
+                (acc, it) => acc + (Number(it.quantity) || 0) * (Number(it.discount) || 0),
+                0
+              );
+              const overallDiscount = Number(invoice.discount) || 0;
+              const totalDiscount = itemsDiscount + overallDiscount;
+
+              return (
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-foreground/70">Subtotal:</span>
+                    <span className="font-mono font-medium">{formatPrice(invoice.subtotal || 0)}</span>
+                  </div>
+                  {totalDiscount > 0 && (
+                    <div className="flex justify-between text-emerald-600">
+                      <span>Discount:</span>
+                      <span className="font-mono">-{formatPrice(totalDiscount)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-foreground/70">
+                    <span>Shipping:</span>
+                    <span className="font-mono">
+                      {(invoice.shipping || 0) === 0 ? "FREE" : formatPrice(invoice.shipping || 0)}
+                    </span>
+                  </div>
+                  {invoice.taxEnabled && (
+                    <div className="flex justify-between text-foreground/70">
+                      <span>Tax ({invoice.taxRate || 0}%):</span>
+                      <span className="font-mono">{formatPrice(invoice.tax || 0)}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              );
+            })()}
 
             <div className="border-t-2 border-rose/30 pt-3 flex justify-between items-center font-bold">
               <span className="font-serif text-sm">Grand Total:</span>
