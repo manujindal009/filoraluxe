@@ -191,7 +191,8 @@ export function printInvoice(elementId: string) {
             display: block;
           }
 
-         #invoice-template-printable {
+         #invoice-template-printable,
+         #expense-voucher-printable {
   width: 211mm !important;
   max-width: 211mm !important;
   min-height: auto !important;
